@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KIN Management System</title>
+<style>
+:root{--g:#095e43;--gd:#074331;--gold:#d4a017;--bg:#eef3f0;--tx:#1f2d3d;--mut:#6b7a72;--card:#fff;--red:#c62828;--line:#dde5e1;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:14.5px}
+[dir="rtl"] body{text-align:right}
+header.top{background:var(--g);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+header.top .t{font-weight:800;font-size:16px;text-transform:uppercase;flex:1;min-width:0}
+header.top .t small{display:block;font-weight:400;font-size:11.5px;opacity:.85;text-transform:none}
+header.top button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+header.top button:hover{background:rgba(255,255,255,.28)}
+nav.tabs{background:#fff;border-bottom:2px solid var(--line);display:flex;gap:2px;padding:0 12px;overflow-x:auto;position:sticky;top:57px;z-index:40}
+nav.tabs a{padding:12px 16px;text-decoration:none;color:var(--tx);font-weight:600;font-size:14px;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs a.on{color:var(--g);border-bottom-color:var(--g)}
+.wrap{max-width:1080px;margin:0 auto;padding:18px 14px 60px}
+.card{background:var(--card);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:18px;margin-bottom:16px}
+.card h2{font-size:17px;color:var(--g);margin-bottom:12px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:16px;border-top:4px solid var(--g)}
+.stat .n{font-size:26px;font-weight:800;color:var(--g)}
+.stat .l{font-size:13px;color:var(--mut);margin-top:2px}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{background:#e6efe9;color:var(--gd);text-align:left;padding:9px 8px;font-size:12.5px;text-transform:uppercase;letter-spacing:.3px}
+[dir="rtl"] .tbl th{text-align:right}
+.tbl td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:hover td{background:#f6faf7}
+.btn{display:inline-block;background:var(--g);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--gd)}
+.btn.gold{background:var(--gold);color:#3a2c00}.btn.gold:hover{background:#b8890f}
+.btn.red{background:var(--red)}.btn.red:hover{background:#a11f1f}
+.btn.gh{background:#fff;color:var(--g);border:1.5px solid var(--g)}.btn.gh:hover{background:#e6efe9}
+.btn.sm{padding:5px 11px;font-size:12.5px;border-radius:7px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.frow{margin-bottom:12px}
+.frow label{display:block;font-weight:600;font-size:13px;margin-bottom:5px}
+.frow input,.frow select,.frow textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;font-family:inherit;background:#fff;color:#1f2d3d};color:#1f2d3d
+.frow input:focus,.frow select:focus{border-color:var(--g);outline:none}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.f2{grid-template-columns:1fr}}
+.req{color:var(--red)}
+.err{background:#fdecea;color:#7f1d1d;border:1px solid #f5c6c2;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:none;font-size:13.5px}
+.ok{background:#e6f4ec;color:var(--gd);border:1px solid #bfe3cf;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:none;font-size:13.5px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.b-paid{background:#e6f4ec;color:var(--gd)}.b-unpaid{background:#fdecea;color:#7f1d1d}.b-partial{background:#fff8e1;color:#6b4e00}
+.search{width:100%;max-width:380px;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;font-size:14px}
+.loginwrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.logincard{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.12);padding:32px 28px;width:100%;max-width:380px;text-align:center}
+.logincard h1{color:var(--g);font-size:20px;margin-bottom:4px;text-transform:uppercase}
+.logincard p{color:var(--mut);font-size:13px;margin-bottom:18px}
+.hint{font-size:12px;color:var(--mut);margin-top:12px;background:#fff8e1;border-radius:8px;padding:8px}
+#printArea{display:none}
+@media print{
+ body>*{display:none!important}
+ #printArea{display:block!important;position:static}
+ .doc{max-width:700px;margin:0 auto;font-size:14px}
+ .doc h1{font-size:20px;color:#000;margin-bottom:2px}
+ .doc .dh{border-bottom:3px double #000;padding-bottom:10px;margin-bottom:14px}
+ .doc table{width:100%;border-collapse:collapse;margin:12px 0}
+ .doc td,.doc th{border:1px solid #000;padding:7px 10px;text-align:left}
+ .doc .sig{margin-top:40px;display:flex;justify-content:space-between}
+ .doc .amt{font-size:20px;font-weight:800}
+}
+.doc-head{text-align:center;margin-bottom:6px}
+.mut{color:var(--mut);font-size:13px}
+.mt{margin-top:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gd);color:#fff;padding:12px 22px;border-radius:10px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.25);opacity:0;transition:all .3s;z-index:200;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="printArea"></div>
+<script>
+"use strict";
+/* KIN Management System v1 — offline-first, single file. Data: IndexedDB. */
+var T={
+en:{app_sub:"Management System",nav_dash:"Dashboard",nav_stu:"Students",nav_fee:"Fees",nav_rep:"Reports",nav_bak:"Backup",nav_set:"Settings",logout:"Logout",lang:"اردو",
+login_title:"Staff Login",login_pass:"Password",login_btn:"Login",login_bad:"Wrong password. Try again.",login_hint:"Default password: khalil123 — change it in Settings after first login.",
+d_total:"Total Students",d_coll:"Collected This Month",d_dues:"Total Dues",d_recent:"Recent Payments",d_add:"Add Student",d_challan:"Fee Challans",d_none:"No payments yet",d_view:"View All",
+s_title:"Students",s_search:"Search name, CNIC or phone…",s_add:"Add Student",s_name:"Name",s_cnic:"CNIC",s_phone:"Phone",s_prog:"Program",s_dues:"Dues (Rs)",s_act:"Actions",s_edit:"Edit",s_del:"Delete",s_pay:"Fees",s_nor:"No students found",s_confirm_del:"Delete this student and ALL their fee records? This cannot be undone.",
+f_name:"Full name",f_father:"Father name",f_gender:"Gender",f_male:"Male",f_female:"Female",f_dob:"Date of birth",f_cnic:"CNIC / B-Form",f_phone:"Mobile",f_wa:"WhatsApp",f_email:"Email",f_dist:"District",f_addr:"Address",f_qual:"Qualification",f_board:"Board",f_marks:"Marks %",f_year:"Passing year",f_prog:"Program",f_src:"Source",f_save:"Save",f_cancel:"Cancel",f_dup:"This CNIC already exists in the system.",f_bad:"Please correct the fields and try again.",f_adm:"Admission date",f_status:"Status",f_active:"Active",f_left:"Left",f_done:"Completed",
+fee_title:"Fee Management",fee_struct:"Fee Structure",fee_addhead:"Add Fee Head",fee_head:"Title",fee_amt:"Amount (Rs)",fee_del:"Delete",fee_challans:"Challans",fee_new:"New Challan",fee_student:"Student",fee_due:"Due date",fee_create:"Create Challan",fee_no:"Challan No",fee_status:"Status",fee_unpaid:"Unpaid",fee_partial:"Partial",fee_paid:"Paid",fee_pay:"Record Payment",fee_pamt:"Amount (Rs)",fee_method:"Method",fee_cash:"Cash",fee_bank:"Bank",fee_jazz:"JazzCash",fee_easy:"EasyPaisa",fee_submit:"Save Payment",fee_receipt:"Receipt",fee_print:"Print",fee_dues:"Dues List",fee_total_due:"Total due",fee_nor:"No challans found",fee_overdue:"Overdue",fee_by:"Received by",fee_date:"Date",fee_select_stu:"Select student…",fee_select_head:"Select fee head…",fee_exists:"An unpaid challan for this fee head already exists for this student.",
+rep_title:"Reports",rep_coll:"Fee Collection",rep_month:"Month",rep_total:"Total collected",rep_bymethod:"By method",rep_def:"Defaulters",rep_enroll:"Enrollment by Program",rep_count:"Students",rep_nor:"No data for this period",rep_stu:"Student",rep_prog:"Program",rep_due:"Due (Rs)",rep_from:"From",rep_to:"To",
+bak_title:"Backup",bak_exp:"Download Backup File",bak_exp_d:"Saves ALL data to a file. Copy it to a USB stick for safekeeping.",bak_imp:"Restore from File",bak_imp_d:"Replaces ALL current data with the backup file.",bak_confirm:"This will REPLACE all current data with the file. Continue?",bak_done:"Backup downloaded.",bak_restored:"Data restored successfully.",bak_drive:"Google Drive Backup",bak_drive_d:"Automatic encrypted backup to the institute's Google Drive (needs internet + one-time sign-in).",bak_connect:"Connect Google Drive",bak_now:"Backup to Drive Now",bak_ok:"Uploaded to Drive successfully.",bak_need:"Enter the Google Client ID in Settings first.",bak_offline:"No internet connection — connect and try again.",bak_enc:"Backups are encrypted before upload. Only this institute can read them.",
+set_title:"Settings",set_pass:"Change Password",set_new:"New password",set_save:"Save Changes",set_saved:"Settings saved.",set_inst:"Institute Name",set_client:"Google Client ID (for Drive backup)",set_wipe:"Danger Zone",set_wipe_b:"Erase ALL Data",set_wipe_c:"Type DELETE in the box and press the button to erase everything.",set_wiped:"All data has been erased.",
+cmn_close:"Close",cmn_rs:"Rs",set_bakpass:"Backup password (for Drive uploads)",ses_title:"Sessions",ses_add:"Add Session",ses_name:"Session name",ses_type:"Type",ses_spring:"Spring",ses_fall:"Fall",ses_year:"Year",ses_active:"Active",ses_inactive:"Inactive",ses_select:"Select session",
+f_roll:"Roll No",f_session:"Session",f_csys:"Course system",f_annual:"Annual",f_semester:"Semester",
+fee_type:"Fee head",fh_admission:"Admission Fee",fh_tuition:"Tuition Fee",fh_exam:"Exam Fee",fh_reg:"Registration Fee",fh_idcard:"ID Card Fee",fh_book:"Book Charges",fh_other:"Other Charges",fh_fine:"Fine",fh_monthly:"Monthly Fee",
+fee_gen_month:"Generate Monthly Slips",fee_gen_done:"Monthly slips generated",fee_add_fine:"Add Fine",fee_fine_amt:"Fine amount (Rs)",fee_fine_why:"Reason",
+ac_title:"Accounts",ac_exp:"Expenses",ac_add_exp:"Add Expense",ac_cat:"Category",ac_date:"Date",ac_title_f:"Title",ac_amt:"Amount (Rs)",ac_bal:"Balance Sheet",ac_income:"Income (fee)",ac_exp_total:"Total expenses",ac_balance:"Balance",ac_day:"Day",ac_vouchers:"Vouchers",ac_search:"Search date / month",ac_cat_stock:"Stock purchase",ac_cat_books:"Books",ac_cat_news:"Newspaper",ac_cat_util:"Utilities",ac_cat_rent:"Rent",ac_cat_salary:"Salaries",ac_cat_other:"Other",
+hr_title:"HR — Employees",hr_add:"Add Employee",hr_name:"Name",hr_desig:"Designation",hr_salary:"Salary (Rs)",hr_join:"Joining date",hr_cnic:"CNIC",hr_phone:"Phone",hr_saved:"Employee added successfully",hr_nor:"No employees found",
+at_title:"Attendance",at_stu:"Students",at_emp:"Employees",at_date:"Date",at_present:"Present",at_absent:"Absent",at_leave:"Leave",at_save:"Save Attendance",at_saved:"Attendance saved",at_total:"Total",at_month:"Month",at_summary:"Summary",at_days:"Days",at_p:"P",at_a:"A",at_l:"L",
+us_title:"Users",us_add:"Add User",us_name:"Full name",us_user:"Username",us_pass:"Password",us_rights:"Module access",us_saved:"User saved",us_admin:"Administrator",us_del:"Delete",us_cannot:"You cannot delete your own account",
+login_user:"Username",login_new:"",
+bak_bydate:"Backup by Date",bak_bydate_d:"Download one day's records (payments, expenses, attendance).",
+msg_saved:"Saved successfully",nav_hr:"HR",nav_at:"Attendance",nav_ac:"Accounts",fb_note:"Compatibility mode: using basic browser storage. For best performance open this file in Chrome or Edge."},
+ur:{app_sub:"مینجمنٹ سسٹم",nav_dash:"ڈیش بورڈ",nav_stu:"طلبہ",nav_fee:"فیس",nav_rep:"رپورٹس",nav_bak:"بیک اپ",nav_set:"ترتیبات",logout:"لاگ آؤٹ",lang:"EN",
+login_title:"عملے کا لاگ اِن",login_pass:"پاس ورڈ",login_btn:"لاگ اِن",login_bad:"غلط پاس ورڈ۔ دوبارہ کوشش کریں۔",login_hint:"پہلے سے طے شدہ پاس ورڈ: khalil123 — پہلے لاگ اِن کے بعد ترتیبات میں تبدیل کریں۔",
+d_total:"کل طلبہ",d_coll:"اس ماہ وصول شدہ",d_dues:"کل بقایا جات",d_recent:"حالیہ ادائیگیاں",d_add:"طالب علم شامل کریں",d_challan:"فیس چالانات",d_none:"ابھی کوئی ادائیگی نہیں",d_view:"سب دیکھیں",
+s_title:"طلبہ",s_search:"نام، شناختی کارڈ یا فون تلاش کریں…",s_add:"نیا طالب علم",s_name:"نام",s_cnic:"شناختی کارڈ",s_phone:"فون",s_prog:"پروگرام",s_dues:"بقایا (روپے)",s_act:"عمل",s_edit:"ترمیم",s_del:"حذف",s_pay:"فیس",s_nor:"کوئی طالب علم نہیں ملا",s_confirm_del:"اس طالب علم اور اس کا تمام فیس ریکارڈ حذف کریں؟ یہ واپس نہیں ہوگا۔",
+f_name:"پورا نام",f_father:"والد کا نام",f_gender:"صنف",f_male:"مرد",f_female:"عورت",f_dob:"تاریخ پیدائش",f_cnic:"شناختی کارڈ / ب فارم",f_phone:"موبائل",f_wa:"واٹس ایپ",f_email:"ای میل",f_dist:"ضلع",f_addr:"پتہ",f_qual:"قابلیت",f_board:"بورڈ",f_marks:"نمبرات ٪",f_year:"پاسنگ سال",f_prog:"پروگرام",f_src:"ذریعہ",f_save:"محفوظ کریں",f_cancel:"منسوخ",f_dup:"یہ شناختی کارڈ پہلے سے سسٹم میں موجود ہے۔",f_bad:"براہ کرم خانے درست کر کے دوبارہ کوشش کریں۔",f_adm:"داخلے کی تاریخ",f_status:"حالت",f_active:"فعال",f_left:"چھوڑ گیا",f_done:"مکمل",
+fee_title:"فیس مینجمنٹ",fee_struct:"فیس کا تعین",fee_addhead:"نیا فیس ہیڈ",fee_head:"عنوان",fee_amt:"رقم (روپے)",fee_del:"حذف",fee_challans:"چالانات",fee_new:"نیا چالان",fee_student:"طالب علم",fee_due:"آخری تاریخ",fee_create:"چالان بنائیں",fee_no:"چالان نمبر",fee_status:"حالت",fee_unpaid:"غیر ادا شدہ",fee_partial:"جزوی",fee_paid:"ادا شدہ",fee_pay:"ادائیگی درج کریں",fee_pamt:"رقم (روپے)",fee_method:"طریقہ",fee_cash:"نقد",fee_bank:"بینک",fee_jazz:"جیز کیش",fee_easy:"ایزی پیسہ",fee_submit:"ادائیگی محفوظ کریں",fee_receipt:"رسید",fee_print:"پرنٹ",fee_dues:"بقایا جات کی فہرست",fee_total_due:"کل بقایا",fee_nor:"کوئی چالان نہیں ملا",fee_overdue:"میعاد گزری",fee_by:"وصول کنندہ",fee_date:"تاریخ",fee_select_stu:"طالب علم منتخب کریں…",fee_select_head:"فیس ہیڈ منتخب کریں…",fee_exists:"اس طالب علم کے لیے اس فیس ہیڈ کا غیر ادا شدہ چالان پہلے سے موجود ہے۔",
+rep_title:"رپورٹس",rep_coll:"فیس وصولی",rep_month:"مہینہ",rep_total:"کل وصول شدہ",rep_bymethod:"طریقے کے لحاظ سے",rep_def:"نادہندگان",rep_enroll:"پروگرام کے لحاظ سے داخلے",rep_count:"طلبہ",rep_nor:"اس مدت کا کوئی ڈیٹا نہیں",rep_stu:"طالب علم",rep_prog:"پروگرام",rep_due:"بقایا (روپے)",rep_from:"از",rep_to:"تا",
+bak_title:"بیک اپ",bak_exp:"بیک اپ فائل ڈاؤن لوڈ کریں",bak_exp_d:"تمام ڈیٹا فائل میں محفوظ کریں۔ اسے USB میں کاپی کر کے محفوظ رکھیں۔",bak_imp:"فائل سے بحال کریں",bak_imp_d:"موجودہ تمام ڈیٹا بیک اپ فائل سے بدل جائے گا۔",bak_confirm:"اس سے موجودہ تمام ڈیٹا فائل سے بدل جائے گا۔ جاری رکھیں؟",bak_done:"بیک اپ ڈاؤن لوڈ ہو گیا۔",bak_restored:"ڈیٹا کامیابی سے بحال ہو گیا۔",bak_drive:"گوگل ڈرائیو بیک اپ",bak_drive_d:"ادارے کی گوگل ڈرائیو پر خودکار خفیہ شدہ بیک اپ (انٹرنیٹ + ایک بار سائن اِن درکار)۔",bak_connect:"گوگل ڈرائیو جوڑیں",bak_now:"ابھی ڈرائیو پر بیک اپ کریں",bak_ok:"ڈرائیو پر کامیابی سے اپ لوڈ ہو گیا۔",bak_need:"پہلے ترتیبات میں گوگل کلائنٹ آئی ڈی درج کریں۔",bak_offline:"انٹرنیٹ نہیں — کنیکٹ کر کے دوبارہ کوشش کریں۔",bak_enc:"بیک اپ اپ لوڈ سے پہلے خفیہ کیا جاتا ہے۔ اسے صرف یہ ادارہ پڑھ سکتا ہے۔",
+set_title:"ترتیبات",set_pass:"پاس ورڈ تبدیل کریں",set_new:"نیا پاس ورڈ",set_save:"تبدیلیاں محفوظ کریں",set_saved:"ترتیبات محفوظ ہو گئیں۔",set_inst:"ادارے کا نام",set_client:"گوگل کلائنٹ آئی ڈی (ڈرائیو بیک اپ کے لیے)",set_wipe:"خطرناک زون",set_wipe_b:"تمام ڈیٹا مٹا دیں",set_wipe_c:"سب کچھ مٹانے کے لیے ڈبے میں DELETE لکھیں اور بٹن دبائیں۔",set_wiped:"تمام ڈیٹا مٹا دیا گیا۔",
+cmn_close:"بند کریں",cmn_rs:"روپے",set_bakpass:"بیک اپ پاس ورڈ (ڈرائیو اپ لوڈ کے لیے)",ses_title:"سیشنز",ses_add:"نیا سیشن",ses_name:"سیشن کا نام",ses_type:"قسم",ses_spring:"بہار",ses_fall:"خزاں",ses_year:"سال",ses_active:"فعال",ses_inactive:"غیر فعال",ses_select:"سیشن منتخب کریں",
+f_roll:"رول نمبر",f_session:"سیشن",f_csys:"کورس سسٹم",f_annual:"سالانہ",f_semester:"سمیسٹر",
+fee_type:"فیس ہیڈ",fh_admission:"داخلہ فیس",fh_tuition:"ٹیوشن فیس",fh_exam:"امتحانی فیس",fh_reg:"رجسٹریشن فیس",fh_idcard:"شناختی کارڈ فیس",fh_book:"کتابوں کے چارجز",fh_other:"دیگر چارجز",fh_fine:"جرمانہ",fh_monthly:"ماہانہ فیس",
+fee_gen_month:"ماہانہ سلپ بنائیں",fee_gen_done:"ماہانہ سلپیں بن گئیں",fee_add_fine:"جرمانہ لگائیں",fee_fine_amt:"جرمانے کی رقم (روپے)",fee_fine_why:"وجہ",
+ac_title:"اکاؤنٹس",ac_exp:"اخراجات",ac_add_exp:"نیا خرچ",ac_cat:"قسم",ac_date:"تاریخ",ac_title_f:"عنوان",ac_amt:"رقم (روپے)",ac_bal:"بیلنس شیٹ",ac_income:"آمدنی (فیس)",ac_exp_total:"کل اخراجات",ac_balance:"بیلنس",ac_day:"دن",ac_vouchers:"واؤچرز",ac_search:"تاریخ / مہینے سے تلاش کریں",ac_cat_stock:"اسٹاک خریداری",ac_cat_books:"کتابیں",ac_cat_news:"اخبار",ac_cat_util:"یوٹیلٹی",ac_cat_rent:"کرایہ",ac_cat_salary:"تنخواہیں",ac_cat_other:"دیگر",
+hr_title:"عملہ — ملازمین",hr_add:"نیا ملازم",hr_name:"نام",hr_desig:"عہدہ",hr_salary:"تنخواہ (روپے)",hr_join:"شمولیت کی تاریخ",hr_cnic:"شناختی کارڈ",hr_phone:"فون",hr_saved:"ملازم کامیابی سے شامل ہو گیا",hr_nor:"کوئی ملازم نہیں ملا",
+at_title:"حاضری",at_stu:"طلبہ",at_emp:"ملازمین",at_date:"تاریخ",at_present:"حاضر",at_absent:"غیر حاضر",at_leave:"رخصت",at_save:"حاضری محفوظ کریں",at_saved:"حاضری محفوظ ہو گئی",at_total:"کل",at_month:"مہینہ",at_summary:"خلاصہ",at_days:"دن",at_p:"ح",at_a:"غ",at_l:"ر",
+us_title:"صارفین",us_add:"نیا صارف",us_name:"پورا نام",us_user:"یوزر نیم",us_pass:"پاس ورڈ",us_rights:"ماڈیول رسائی",us_saved:"صارف محفوظ ہو گیا",us_admin:"منتظم",us_del:"حذف",us_cannot:"آپ اپنا اکاؤنٹ حذف نہیں کر سکتے",
+login_user:"یوزر نیم",login_new:"",
+bak_bydate:"تاریخ کے لحاظ سے بیک اپ",bak_bydate_d:"ایک دن کا ریکارڈ ڈاؤن لوڈ کریں (ادائیگیاں، اخراجات، حاضری)۔",
+msg_saved:"کامیابی سے محفوظ ہو گیا",nav_hr:"عملہ",nav_at:"حاضری",nav_ac:"اکاؤنٹس",fb_note:"کمپٹیبلٹی موڈ: بنیادی براؤزر اسٹوریج استعمال ہو رہا ہے۔ بہترین کارکردگی کے لیے یہ فائل کروم یا ایج میں کھولیں۔"}
+};
+
+var PROGRAMS=[{k:"lhv",en:"LHV \u2014 Lady Health Visitor",ur:"\u0627\u06cc\u0644 \u0627\u06cc\u0686 \u0648\u06cc \u2014 \u0644\u06cc\u0688\u06cc \u06c1\u06cc\u0644\u062a\u06be \u0648\u0632\u06cc\u0679\u0631"},{k:"cna",en:"CNA \u2014 Certified Nursing Assistant",ur:"\u0633\u06cc \u0627\u06cc\u0646 \u0627\u06d2 \u2014 \u0633\u0631\u0679\u06cc\u0641\u0627\u0626\u06cc\u0688 \u0646\u0631\u0633\u0646\u06af \u0627\u0633\u0633\u0679\u0646\u0679"},{k:"radio",en:"Radiology Technology",ur:"\u0631\u06cc\u0688\u06cc\u0627\u0644\u0648\u062c\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"cmw",en:"Community Midwifery (CMW)",ur:"\u06a9\u0645\u06cc\u0648\u0646\u0679\u06cc \u0645\u0688\u0648\u0627\u0626\u0641\u0631\u06cc (\u0633\u06cc \u0627\u06cc\u0645 \u0688\u0628\u0644\u06cc\u0648)"},{k:"pharm",en:"Pharmacy Technician (Category B)",ur:"\u0641\u0627\u0631\u0645\u06cc\u0633\u06cc \u0679\u06cc\u06a9\u0646\u06cc\u0634\u0646 (\u06a9\u06cc\u0679\u06cc\u06af\u0631\u06cc \u0628\u06cc)"},{k:"health-dip",en:"Health Technology",ur:"\u06c1\u06cc\u0644\u062a\u06be \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"physio",en:"Physiotherapy Technology",ur:"\u0641\u0632\u06cc\u0648\u062a\u06be\u0631\u0627\u067e\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"cardio",en:"Cardiology Technology",ur:"\u06a9\u0627\u0631\u0688\u06cc\u0627\u0644\u0648\u062c\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"patho-dip",en:"Pathology Technology",ur:"\u067e\u06cc\u062a\u06be\u0627\u0644\u0648\u062c\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"anes-dip",en:"Anesthesia Technology",ur:"\u0627\u06cc\u0646\u0633\u062a\u06be\u06cc\u0632\u06cc\u0627 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"surg-dip",en:"Surgical Technology",ur:"\u0633\u0631\u062c\u06cc\u06a9\u0644 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"dialysis",en:"Dialysis Technology",ur:"\u0688\u0627\u0626\u06cc\u0644\u06cc\u0633\u0632 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"dental-dip",en:"Dental Technology",ur:"\u0688\u06cc\u0646\u0679\u0644 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bsn",en:"Generic BSN",ur:"Generic BSN"},{k:"postrn",en:"Post RN BSN",ur:"Post RN BSN"},{k:"bs-health",en:"BS Health Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u06c1\u06cc\u0644\u062a\u06be \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bs-dental",en:"BS Dental Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u0688\u06cc\u0646\u0679\u0644 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bs-surg",en:"BS Surgical Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u0633\u0631\u062c\u06cc\u06a9\u0644 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bs-anes",en:"BS Anesthesia Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u0627\u06cc\u0646\u0633\u062a\u06be\u06cc\u0632\u06cc\u0627 \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bs-radio",en:"BS Radiology Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u0631\u06cc\u0688\u06cc\u0627\u0644\u0648\u062c\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"bs-patho",en:"BS Pathology Technology",ur:"\u0628\u06cc \u0627\u06cc\u0633 \u067e\u06cc\u062a\u06be\u0627\u0644\u0648\u062c\u06cc \u0679\u06cc\u06a9\u0646\u0627\u0644\u0648\u062c\u06cc"},{k:"fsc",en:"FSc (Pre-Medical)",ur:"\u0627\u06cc\u0641 \u0627\u06cc\u0633 \u0633\u06cc (\u067e\u0631\u06cc \u0645\u06cc\u0688\u06cc\u06a9\u0644)"}];
+/* ---------- utils ---------- */
+var LANG = localStorage.getItem('kin_lang') || 'en';
+function t(k){ return (T[LANG] && T[LANG][k]) || T.en[k] || k; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function fmt(n){ n = Number(n)||0; return n.toLocaleString('en-PK'); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function ym(d){ return String(d).slice(0,7); }
+function progName(k){ for(var i=0;i<PROGRAMS.length;i++) if(PROGRAMS[i].k===k) return PROGRAMS[i][LANG]||PROGRAMS[i].en; return k; }
+function setLang(l){ LANG=l; localStorage.setItem('kin_lang',l); document.documentElement.lang = l==='ur'?'ur':'en'; document.documentElement.dir = l==='ur'?'rtl':'ltr'; render(); }
+function _cyrb(str,seed){ var h1=0xdeadbeef^seed, h2=0x41c6ce57^seed; for(var i=0;i<str.length;i++){ var ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677); } h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909); return (h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0'); }
+async function sha(s){ s='kin|'+String(s); return 'c53$'+_cyrb(s,7)+_cyrb(s,99)+_cyrb(s,1234)+_cyrb(s,987654); }
+function pwToggle(id){ var i=document.getElementById(id); if(!i) return; var show=i.type==='password'; i.type=show?'text':'password'; var b=document.getElementById(id+'_eye'); if(b) b.textContent=show?'\uD83D\uDC41':'\uD83D\uDC41\u200D\uD83D\uDDE8'; }
+function pwField(id,ph){ return '<div style="position:relative"><input type="password" id="'+id+'"'+(ph?' placeholder="'+ph+'"':'')+' style="padding-right:42px"><button type="button" id="'+id+'_eye" onclick="pwToggle(\''+id+'\')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;padding:4px" tabindex="-1">\uD83D\uDC41\u200D\uD83D\uDDE8</button></div>'; }
+function showErr(id,msg){ var e=document.getElementById(id); if(e){e.textContent=msg; e.style.display='block';} }
+function showOk(id,msg){ var e=document.getElementById(id); if(e){e.textContent=msg; e.style.display='block';} }
+function toast(msg){ var d=document.createElement('div'); d.className='toast'; d.textContent=msg; document.body.appendChild(d); setTimeout(function(){d.classList.add('show');},20); setTimeout(function(){d.classList.remove('show'); setTimeout(function(){d.remove();},350);},2300); }
+
+/* ---------- database (localStorage fallback when IndexedDB is blocked) ---------- */
+var LS = {
+  _k:function(st){ return 'kinls_'+st; },
+  _seqk:function(st){ return 'kinls_seq_'+st; },
+  _read:function(st){ try{ return JSON.parse(localStorage.getItem(this._k(st))||'{}'); }catch(e){ return {}; } },
+  _write:function(st,o){ localStorage.setItem(this._k(st), JSON.stringify(o)); },
+  _keyOf:function(st,obj){
+    if(st==='students'||st==='employees') return obj.cnic;
+    if(st==='users') return obj.username;
+    if(st==='settings') return obj.k;
+    return obj.id;
+  },
+  _auto:function(st){ return st==='feeHeads'||st==='challans'||st==='payments'||st==='sessions'||st==='attendance'||st==='expenses'; },
+  get:async function(st,k){ var o=this._read(st), v=o[String(k)]; return v===undefined?null:v; },
+  put:async function(st,obj){
+    var o=this._read(st), key=this._keyOf(st,obj);
+    if((key===undefined||key===null)&&this._auto(st)){
+      var sq=Number(localStorage.getItem(this._seqk(st))||'0')+1;
+      localStorage.setItem(this._seqk(st),String(sq));
+      obj.id=sq; key=sq;
+    }
+    o[String(key)]=obj; this._write(st,o); return key;
+  },
+  del:async function(st,k){ var o=this._read(st); delete o[String(k)]; this._write(st,o); },
+  all:async function(st){ var o=this._read(st); return Object.keys(o).map(function(k){return o[k];}); },
+  byIndex:async function(st,idx,val){
+    var all=await this.all(st);
+    var f = idx==='byStudent'?'cnic':(idx==='byChallan'?'challanId':(idx==='byDate'?'date':null));
+    if(!f) return [];
+    return all.filter(function(r){ return String(r[f])===String(val); });
+  },
+  clear:async function(st){ localStorage.removeItem(this._k(st)); localStorage.removeItem(this._seqk(st)); }
+};
+/* ---------- database (IndexedDB) ---------- */
+var DB = {
+  db:null, backend:'idb',
+  open:function(){ return new Promise(function(res,rej){
+    if(DB.backend==='ls'){ res(); return; }
+    var r;
+    try{ r = indexedDB.open('kin_mis',2); }
+    catch(e){ DB.backend='ls'; res(); return; }
+    r.onupgradeneeded = function(e){
+      var d = e.target.result, ov = e.oldVersion||0;
+      if(ov<1){
+        d.createObjectStore('students',{keyPath:'cnic'});
+        d.createObjectStore('feeHeads',{keyPath:'id',autoIncrement:true});
+        var ch = d.createObjectStore('challans',{keyPath:'id',autoIncrement:true});
+        ch.createIndex('byStudent','cnic',{unique:false});
+        var py = d.createObjectStore('payments',{keyPath:'id',autoIncrement:true});
+        py.createIndex('byChallan','challanId',{unique:false});
+        d.createObjectStore('settings',{keyPath:'k'});
+      }
+      if(ov<2){
+        d.createObjectStore('sessions',{keyPath:'id',autoIncrement:true});
+        d.createObjectStore('employees',{keyPath:'cnic'});
+        var at = d.createObjectStore('attendance',{keyPath:'id',autoIncrement:true});
+        at.createIndex('byDate','date',{unique:false});
+        d.createObjectStore('expenses',{keyPath:'id',autoIncrement:true});
+        d.createObjectStore('users',{keyPath:'username'});
+      }
+    };
+    r.onsuccess = function(e){ DB.db=e.target.result; res(); };
+    r.onerror = function(e){
+      var nm = (e.target.error&&e.target.error.name)||'';
+      if(nm==='SecurityError'||nm==='UnknownError'){ DB.backend='ls'; res(); return; }
+      rej(e);
+    };
+  });},
+  store:function(n,mode){ return DB.db.transaction(n,mode||'readonly').objectStore(n); },
+  all:function(n){ if(DB.backend==='ls') return LS.all(n); return new Promise(function(res,rej){ var q=DB.store(n).getAll(); q.onsuccess=function(){res(q.result||[]);}; q.onerror=rej; }); },
+  get:function(n,k){ if(DB.backend==='ls') return LS.get(n,k); return new Promise(function(res,rej){ var q=DB.store(n).get(k); q.onsuccess=function(){res(q.result||null);}; q.onerror=rej; }); },
+  put:function(n,v){ if(DB.backend==='ls') return LS.put(n,v); return new Promise(function(res,rej){ var q=DB.store(n,'readwrite').put(v); q.onsuccess=function(){res(q.result);}; q.onerror=rej; }); },
+  del:function(n,k){ if(DB.backend==='ls') return LS.del(n,k); return new Promise(function(res,rej){ var q=DB.store(n,'readwrite').delete(k); q.onsuccess=function(){res();}; q.onerror=rej; }); },
+  clear:function(n){ if(DB.backend==='ls') return LS.clear(n); return new Promise(function(res,rej){ var q=DB.store(n,'readwrite').clear(); q.onsuccess=function(){res();}; q.onerror=rej; }); },
+  byIndex:function(n,idx,val){ if(DB.backend==='ls') return LS.byIndex(n,idx,val); return new Promise(function(res,rej){ var q=DB.store(n).index(idx).getAll(val); q.onsuccess=function(){res(q.result||[]);}; q.onerror=rej; }); }
+};
+async function setting(k,def){ var s = await DB.get('settings',k); return s ? s.v : def; }
+async function setSetting(k,v){ await DB.put('settings',{k:k,v:v}); }
+async function nextNo(prefix,key){ var n = Number(await setting(key,0))||0; n++; await setSetting(key,n); var y=new Date().getFullYear(); return prefix+'-'+y+'-'+String(n).padStart(4,'0'); }
+
+/* ---------- auth ---------- */
+async function ensureAuth(){
+  var users = await DB.all('users');
+  if(!users.length){
+    var oldH = await setting('passHash', null);
+    var hp = oldH || await sha('khalil123');
+    await DB.put('users', {username:'admin', name:'Administrator', passHash:hp, rights:MODULES.map(function(m){return m[0];})});
+    if(!oldH) await setSetting('mustChange','1');
+  }
+  if(!await setting('instName',null)) await setSetting('instName','Khalil Institute of Nursing & Allied Health Sciences');
+}
+function loggedIn(){ return sessionStorage.getItem('kin_user'); }
+
+/* ---------- shell ---------- */
+var MODULES = [['dash','nav_dash'],['students','nav_stu'],['fees','nav_fee'],['hr','nav_hr'],['attendance','nav_at'],['accounts','nav_ac'],['reports','nav_rep'],['backup','nav_bak'],['settings','nav_set']];
+var _curUser = null;
+async function curUser(){
+  var u = sessionStorage.getItem('kin_user');
+  if(!u) return null;
+  if(_curUser && _curUser.username===u) return _curUser;
+  _curUser = await DB.get('users', u);
+  return _curUser;
+}
+function hasRight(u, mod){ return u && u.rights && u.rights.indexOf(mod)>=0; }
+var ROUTES = ['dash','students','fees','reports','backup','settings'];
+function shell(inner, active){
+  var u = _curUser;
+  var tabs = MODULES.filter(function(x){ return hasRight(u, x[0]); })
+    .map(function(x){ return '<a href="#/'+x[0]+'" class="'+(active===x[0]?'on':'')+'">'+t(x[1])+'</a>'; }).join('');
+  return '<header class="top"><div class="t">'+esc('KHALIL INSTITUTE')+'<small>'+t('app_sub')+'</small></div>'
+    +'<span class="mut" style="color:#fff;opacity:.85">'+esc(u?u.name:'')+'</span>'
+    +'<button onclick="setLang(\''+(LANG==='ur'?'en':'ur')+'\')">'+t('lang')+'</button>'
+    +'<button onclick="doLogout()">'+t('logout')+'</button>'
+    +(DB.backend==='ls'?'<div style="background:#8a6d1a;color:#fff;font-size:12px;padding:6px 12px;text-align:center">'+t('fb_note')+'</div>':'')
+    +'</header>'
+    +'<nav class="tabs">'+tabs+'</nav><div class="wrap">'+inner+'</div>';
+}
+function doLogout(){ _curUser=null; sessionStorage.removeItem('kin_user'); location.hash='#/login'; }
+function go(r){ location.hash = '#/'+r; }
+
+async function render(){
+  var app = document.getElementById('app');
+  var h = location.hash || '#/dash';
+  var u = await curUser();
+  if(!u && h!=='#/login'){ location.hash='#/login'; return; }
+  if(h==='#/login'){ if(u){ location.hash='#/'+((u.rights||[])[0]||'dash'); return; } app.innerHTML = vLogin(); return; }
+  var r = h.replace('#/','').split('/');
+  var _mod = r[0]==='student' ? 'students' : r[0];
+  if(!hasRight(u, _mod)){ location.hash = '#/'+((u.rights||[])[0]||'dash'); return; }
+  try{
+    if(r[0]==='dash') app.innerHTML = shell(await vDash(),'dash');
+    else if(r[0]==='students') app.innerHTML = shell(await vStudents(r[1]||''),'students');
+    else if(r[0]==='student') app.innerHTML = shell(await vStudentForm(r[1]||'new'),'students');
+    else if(r[0]==='fees') app.innerHTML = shell(await vFees(r.slice(1).join('/')),'fees');
+    else if(r[0]==='hr') app.innerHTML = shell(await vHR(),'hr');
+    else if(r[0]==='attendance') app.innerHTML = shell(await vAttendance(r[1]||''),'attendance');
+    else if(r[0]==='accounts') app.innerHTML = shell(await vAccounts(r[1]||''),'accounts');
+    else if(r[0]==='reports') app.innerHTML = shell(await vReports(),'reports');
+    else if(r[0]==='backup') app.innerHTML = shell(vBackup(),'backup');
+    else if(r[0]==='settings') app.innerHTML = shell(await vSettings(),'settings');
+    else app.innerHTML = shell(await vDash(),'dash');
+  }catch(err){ app.innerHTML = shell('<div class="card"><div class="err" style="display:block">Error: '+esc(err.message||err)+'</div></div>','dash'); }
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', render);
+
+/* ---------- login ---------- */
+function vLogin(){
+  return '<div class="loginwrap"><div class="logincard"><h1>Khalil Institute</h1><p>'+t('app_sub')+' — '+t('login_title')+'</p>'
+  +'<div class="err" id="lgErr"></div>'
+  +'<form onsubmit="return doLogin(event)">'
+  +'<div class="frow" style="text-align:left"><label>'+t('login_user')+'</label><input id="lgUser" autocomplete="username" dir="ltr"></div>'
+  +'<div class="frow" style="text-align:left"><label>'+t('login_pass')+'</label>'+pwField('lgPass')+'</div>'
+  +'<button class="btn" type="submit" style="width:100%">'+t('login_btn')+'</button></form>'
+  +'<div class="hint">'+t('login_hint')+'</div></div></div>';
+}
+async function doLogin(e){
+  e.preventDefault();
+  try{
+    var un = val('lgUser').toLowerCase(), u = un ? await DB.get('users', un) : null;
+    var h = await sha(val('lgPass'));
+    if(u && u.passHash && u.passHash.indexOf('c53$')!==0 && window.crypto && crypto.subtle){
+      try{ var b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('kin|'+val('lgPass')));
+        var oldH=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+        if(oldH===u.passHash){ u.passHash=h; await DB.put('users',u); }
+      }catch(e){}
+    }
+    if(u && h === u.passHash){
+      _curUser = u;
+      sessionStorage.setItem('kin_user', u.username);
+      var first = (u.rights||[])[0] || 'dash';
+      if(await setting('mustChange','0')==='1' && u.username==='admin'){ location.hash='#/settings'; }
+      else location.hash = '#/'+first;
+    } else showErr('lgErr', t('login_bad'));
+  }catch(err){ showErr('lgErr', 'Error: '+(err&&err.message?err.message:String(err))); }
+  return false;
+}
+
+/* ---------- dashboard ---------- */
+async function duesOf(cnic){
+  var ch = await DB.byIndex('challans','byStudent',cnic), d=0;
+  for(var i=0;i<ch.length;i++) d += (Number(ch[i].amount)||0)-(Number(ch[i].paid)||0);
+  return d;
+}
+async function vDash(){
+  await warmStuCache();
+  var students = await DB.all('students');
+  var payments = await DB.all('payments');
+  var m = ym(today()), coll=0, dues=0;
+  for(var i=0;i<payments.length;i++) if(ym(payments[i].date)===m) coll += Number(payments[i].amount)||0;
+  var challans = await DB.all('challans');
+  for(var j=0;j<challans.length;j++) dues += (Number(challans[j].amount)||0)-(Number(challans[j].paid)||0);
+  payments.sort(function(a,b){ return b.date<a.date?-1:1; });
+  var recent = payments.slice(0,8).map(function(p){
+    return '<tr><td dir="ltr">'+esc(p.date)+'</td><td>'+esc(p.recNo)+'</td><td>'+esc(stuName(p.cnic))+'</td><td style="text-align:right">'+fmt(p.amount)+'</td><td>'+esc(methodName(p.method))+'</td></tr>';
+  }).join('');
+  return '<div class="grid g4">'
+  +'<div class="stat"><div class="n">'+students.length+'</div><div class="l">'+t('d_total')+'</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(coll)+'</div><div class="l">'+t('d_coll')+' ('+t('cmn_rs')+')</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(dues)+'</div><div class="l">'+t('d_dues')+' ('+t('cmn_rs')+')</div></div>'
+  +'<div class="stat"><div class="n">'+challans.filter(function(c){return (Number(c.amount)-Number(c.paid))>0;}).length+'</div><div class="l">'+t('fee_challans')+' ('+t('fee_unpaid')+')</div></div></div>'
+  +'<div class="card"><div class="between"><h2>'+t('d_recent')+'</h2><div class="row"><a class="btn sm" href="#/student/new">'+t('d_add')+'</a><a class="btn sm gold" href="#/fees">'+t('d_challan')+'</a></div></div>'
+  +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th>'+t('fee_method')+'</th></tr>'
+  +(recent||'<tr><td colspan="5" class="mut">'+t('d_none')+'</td></tr>')+'</table></div></div>';
+}
+var _stuCache={};
+function stuName(cnic){
+  if(_stuCache[cnic]) return _stuCache[cnic].name||cnic;
+  return cnic;
+}
+async function warmStuCache(){ var s=await DB.all('students'); _stuCache={}; for(var i=0;i<s.length;i++) _stuCache[s[i].cnic]=s[i]; }
+async function sesOpts(sel){
+  var ss = await DB.all('sessions');
+  ss.sort(function(a,b){ return b.year-a.year || (a.type<b.type?-1:1); });
+  return ss.map(function(x){ return '<option value="'+x.id+'"'+(String(x.id)===String(sel)?' selected':'')+'>'+esc(x.name)+(x.active?'':' ('+t('ses_inactive')+')')+'</option>'; }).join('');
+}
+async function nextRoll(sessionId){
+  var ss = await DB.all('students'), mx=0;
+  for(var i=0;i<ss.length;i++) if(String(ss[i].session)===String(sessionId) && Number(ss[i].roll)>mx) mx=Number(ss[i].roll);
+  return mx+1;
+}
+function methodName(m){ return {cash:t('fee_cash'),bank:t('fee_bank'),jazz:t('fee_jazz'),easy:t('fee_easy')}[m]||m; }
+var FHEADS = ['admission','tuition','exam','reg','idcard','book','other','fine','monthly'];
+function headName(k){ return t('fh_'+k)||k; }
+function headOpts(sel){ return FHEADS.map(function(k){ return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+headName(k)+'</option>'; }).join(''); }
+
+/* ---------- students ---------- */
+async function vStudents(q){
+  await warmStuCache();
+  var students = await DB.all('students');
+  q=(q||'').toLowerCase();
+  var rows='';
+  for(var i=0;i<students.length;i++){
+    var s=students[i];
+    if(q && (s.name+' '+s.cnic+' '+(s.phone||'')).toLowerCase().indexOf(q)<0) continue;
+    var d = await duesOf(s.cnic);
+    rows += '<tr><td>'+esc(s.roll||'-')+'</td><td><a href="#/student/'+esc(s.cnic)+'">'+esc(s.name)+'</a></td><td dir="ltr">'+esc(s.cnic)+'</td><td dir="ltr">'+esc(s.phone||'-')+'</td><td>'+esc(progName(s.program))+'</td>'
+    +'<td style="text-align:right;color:'+(d>0?'var(--red)':'var(--g)')+';font-weight:700">'+fmt(d)+'</td>'
+    +'<td><a class="btn sm gh" href="#/student/'+esc(s.cnic)+'">'+t('s_edit')+'</a> <button class="btn sm red" onclick="delStudent(\''+esc(s.cnic)+'\')">'+t('s_del')+'</button></td></tr>';
+  }
+  var sesRows = (await DB.all('sessions')).map(function(x){
+    return '<tr><td>'+esc(x.name)+'</td><td>'+(x.type==='spring'?t('ses_spring'):t('ses_fall'))+'</td><td>'+x.year+'</td><td>'+(x.active?t('ses_active'):t('ses_inactive'))+'</td>'
+    +'<td><button class="btn sm gh" onclick="toggleSes('+x.id+')">'+(x.active?t('ses_inactive'):t('ses_active'))+'</button></td></tr>';
+  }).join('');
+  return '<div class="card"><h2>'+t('ses_title')+'</h2><div class="f2"><div class="frow"><label>'+t('ses_name')+'</label><input id="ses_name" placeholder="Spring 2026" dir="ltr"></div>'
+  +'<div class="frow"><label>'+t('ses_type')+'</label><select id="ses_type"><option value="spring">'+t('ses_spring')+'</option><option value="fall">'+t('ses_fall')+'</option></select></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('ses_year')+'</label><input id="ses_year" inputmode="numeric" value="'+new Date().getFullYear()+'"></div>'
+  +'<div class="frow"><label>&nbsp;</label><button class="btn" onclick="addSession()">'+t('ses_add')+'</button></div></div>'
+  +'<table class="tbl mt"><tr><th>'+t('ses_name')+'</th><th>'+t('ses_type')+'</th><th>'+t('ses_year')+'</th><th>'+t('fee_status')+'</th><th></th></tr>'+(sesRows||'<tr><td colspan="5" class="mut">'+t('s_nor')+'</td></tr>')+'</table></div>'
+  +'<div class="card"><div class="between"><h2>'+t('s_title')+'</h2><a class="btn" href="#/student/new">'+t('s_add')+'</a></div>'
+  +'<div class="mt"><input class="search" id="stuQ" placeholder="'+t('s_search')+'" value="'+esc(q)+'" onkeydown="if(event.key===\'Enter\')stuSearch()\"><button class="btn sm" onclick="stuSearch()">&#128269;</button></div>'
+  +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('f_roll')+'</th><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('s_dues')+'</th><th>'+t('s_act')+'</th></tr>'
+  +'<tbody id="stuRows">'+(rows||'<tr><td colspan="7" class="mut">'+t('s_nor')+'</td></tr>')+'</tbody></table></div></div>'
+  '';
+}
+function stuSearch(){ var v=document.getElementById('stuQ').value.trim(); location.hash='#/students/'+encodeURIComponent(v); }
+async function addSession(){
+  var n=val('ses_name'), ty=val('ses_type'), y=Number(val('ses_year'));
+  if(!n||!y){ toast(t('f_bad')); return; }
+  await DB.put('sessions',{name:n,type:ty,year:y,active:true});
+  toast(t('msg_saved')); render();
+}
+async function toggleSes(id){ var x=await DB.get('sessions',id); if(x){ x.active=!x.active; await DB.put('sessions',x); render(); } }
+async function delStudent(cnic){
+  if(!confirm(t('s_confirm_del'))) return;
+  var ch = await DB.byIndex('challans','byStudent',cnic);
+  for(var i=0;i<ch.length;i++){ var ps=await DB.byIndex('payments','byChallan',ch[i].id); for(var j=0;j<ps.length;j++) await DB.del('payments',ps[j].id); await DB.del('challans',ch[i].id); }
+  await DB.del('students',cnic);
+  render();
+}
+
+function progOpts(sel){
+  return PROGRAMS.map(function(p){ return '<option value="'+p.k+'"'+(p.k===sel?' selected':'')+'>'+esc(p[LANG]||p.en)+'</option>'; }).join('');
+}
+async function vStudentForm(cnic){
+  var isNew = (cnic==='new');
+  var s = isNew ? {program:'lhv',status:'active',adm:today()} : await DB.get('students',cnic);
+  if(!s) return '<div class="card">'+t('s_nor')+'</div>';
+  function f(id,lb,val,rq,type,ph){ return '<div class="frow"><label>'+lb+(rq?' <span class="req">*</span>':'')+'</label><input id="'+id+'" value="'+esc(val||'')+'" '+(type||'')+' placeholder="'+esc(ph||'')+'"></div>'; }
+  var g = '<div class="frow"><label>'+t('f_gender')+' <span class="req">*</span></label><select id="f_gender"><option value="M"'+(s.gender==='M'?' selected':'')+'>'+t('f_male')+'</option><option value="F"'+(s.gender==='F'?' selected':'')+'>'+t('f_female')+'</option></select></div>';
+  var html = '<div class="card"><h2>'+(isNew?t('s_add'):t('s_edit')+' — '+esc(s.name))+'</h2><div class="err" id="stErr"></div>'
+  +'<div class="f2">'+f('f_name',t('f_name'),s.name,1)+f('f_father',t('f_father'),s.father,1)+'</div>'
+  +'<div class="f2">'+g+f('f_dob',t('f_dob'),s.dob,1,'type="date"')+'</div>'
+  +'<div class="f2">'+f('f_cnic',t('f_cnic'),s.cnic,1,'inputmode="numeric"','35202-1234567-1')+f('f_phone',t('f_phone'),s.phone,1,'inputmode="tel"')+'</div>'
+  +'<div class="f2">'+f('f_wa',t('f_wa'),s.wa,0,'inputmode="tel"')+f('f_email',t('f_email'),s.email,0,'type="email"')+'</div>'
+  +'<div class="f2">'+f('f_dist',t('f_dist'),s.district,1)+f('f_qual',t('f_qual'),s.qual,1)+'</div>'
+  +'<div class="f2">'+f('f_board',t('f_board'),s.board,1)+f('f_marks',t('f_marks'),s.marks,1,'inputmode="decimal"')+'</div>'
+  +'<div class="frow"><label>'+t('f_addr')+' <span class="req">*</span></label><textarea id="f_addr" rows="2">'+esc(s.addr||'')+'</textarea></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('f_prog')+' <span class="req">*</span></label><select id="f_prog">'+progOpts(s.program)+'</select></div>'
+  +'<div class="frow"><label>'+t('f_status')+'</label><select id="f_status"><option value="active"'+(s.status==='active'?' selected':'')+'>'+t('f_active')+'</option><option value="left"'+(s.status==='left'?' selected':'')+'>'+t('f_left')+'</option><option value="done"'+(s.status==='done'?' selected':'')+'>'+t('f_done')+'</option></select></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('f_session')+'</label><select id="f_session">'+await sesOpts(s.session)+'</select></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('f_roll')+'</label><input id="f_roll" value="'+esc(s.roll||'')+'" inputmode="numeric"></div>'
+  +'<div class="frow"><label>'+t('f_csys')+'</label><select id="f_csys"><option value="semester"'+(s.csys==='semester'?' selected':'')+'>'+t('f_semester')+'</option><option value="annual"'+(s.csys==='annual'?' selected':'')+'>'+t('f_annual')+'</option></select></div></div></div>'
+  +'<div class="f2">'+f('f_year',t('f_year'),s.year,1,'inputmode="numeric"')+f('f_adm',t('f_adm'),s.adm,0,'type="date"')+'</div>'
+  +'<div class="row"><button class="btn" onclick="saveStudent('+(isNew?'true':'false')+',\''+esc(s.cnic||'')+'\')">'+t('f_save')+'</button><a class="btn gh" href="#/students">'+t('f_cancel')+'</a></div></div>';
+  if(!isNew){
+    var ch = await DB.byIndex('challans','byStudent',s.cnic);
+    var rows = '';
+    for(var i=0;i<ch.length;i++){ var c=ch[i], bal=(Number(c.amount)-Number(c.paid));
+      rows+='<tr><td>'+esc(c.no)+'</td><td>'+esc(c.title)+'</td><td style="text-align:right">'+fmt(c.amount)+'</td><td style="text-align:right">'+fmt(c.paid)+'</td><td style="text-align:right;font-weight:700;color:'+(bal>0?'var(--red)':'var(--g)')+'">'+fmt(bal)+'</td><td>'+statusBadge(c.status)+'</td><td><button class="btn sm" onclick="printChallan('+c.id+')">'+t('fee_print')+'</button></td></tr>';
+    }
+    html += '<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2><div class="row"><a class="btn sm red" href="#/fees/fine/'+esc(s.cnic)+'">'+t('fee_add_fine')+'</a><a class="btn sm gold" href="#/fees/new/'+esc(s.cnic)+'">'+t('fee_new')+'</a></div></div>'
+    +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th style="text-align:right">'+t('fee_paid')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th><th>'+t('fee_status')+'</th><th></th></tr>'+(rows||'<tr><td colspan="7" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>';
+  }
+  return html;
+}
+function statusBadge(st){ return '<span class="badge b-'+st+'">'+t('fee_'+st)+'</span>'; }
+function val(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+async function saveStudent(isNew, oldCnic){
+  var d = { name:val('f_name'), father:val('f_father'), gender:val('f_gender'), dob:val('f_dob'),
+    cnic:val('f_cnic').replace(/\D/g,''), phone:val('f_phone').replace(/\D/g,''), wa:val('f_wa').replace(/\D/g,''),
+    email:val('f_email'), district:val('f_dist'), addr:val('f_addr'), qual:val('f_qual'), board:val('f_board'),
+    marks:val('f_marks'), year:val('f_year'), program:val('f_prog'), status:val('f_status'), adm:val('f_adm')||today(),
+    session:val('f_session'), roll:val('f_roll'), csys:val('f_csys') };
+  var bad = d.name.length<3 || d.father.length<3 || (d.gender!=='M'&&d.gender!=='F') || !/^\d{4}-\d{2}-\d{2}$/.test(d.dob)
+    || d.cnic.length!==13 || !(d.phone.length===11&&d.phone.indexOf('03')===0) || (d.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
+    || d.district.length<2 || d.addr.length<10 || !d.qual || !d.board || !(parseFloat(d.marks)>=0&&parseFloat(d.marks)<=100)
+    || !/^\d{4}$/.test(d.year) || !d.program;
+  if(bad){ showErr('stErr', t('f_bad')); return; }
+  var ex = await DB.get('students', d.cnic);
+  if(ex && (isNew || d.cnic!==oldCnic)){ showErr('stErr', t('f_dup')); return; }
+  if(isNew && !d.roll && d.session){ d.roll = await nextRoll(d.session); }
+  if(!isNew && d.cnic!==oldCnic){
+    // CNIC changed: move challans/payments to new key
+    var chs = await DB.byIndex('challans','byStudent',oldCnic);
+    await DB.del('students', oldCnic);
+    for(var i=0;i<chs.length;i++){ chs[i].cnic=d.cnic; await DB.put('challans',chs[i]);
+      var ps=await DB.byIndex('payments','byChallan',chs[i].id); for(var j=0;j<ps.length;j++){ ps[j].cnic=d.cnic; await DB.put('payments',ps[j]); } }
+  }
+  await DB.put('students', d);
+  location.hash = '#/student/'+d.cnic;
+}
+
+/* ---------- fees ---------- */
+async function vFees(sub){
+  if(sub.indexOf('new/')===0) return await vChallanForm(sub.slice(4));
+  if(sub.indexOf('pay/')===0) return await vPayForm(Number(sub.slice(4)));
+  if(sub.indexOf('fine/')===0) return await vFineForm(sub.slice(5));
+  await warmStuCache();
+  var heads = await DB.all('feeHeads');
+  var challans = await DB.all('challans');
+  challans.sort(function(a,b){return b.id-a.id;});
+  // structure grouped by program
+  var byProg = {};
+  for(var i=0;i<heads.length;i++){ (byProg[heads[i].program]=byProg[heads[i].program]||[]).push(heads[i]); }
+  var structHtml = '';
+  var pkeys = Object.keys(byProg).sort();
+  for(var p=0;p<pkeys.length;p++){
+    var rows = byProg[pkeys[p]].map(function(hh){
+      return '<tr><td>'+esc(hh.title)+'</td><td style="text-align:right">'+fmt(hh.amount)+'</td><td><button class="btn sm red" onclick="delHead('+hh.id+')">'+t('fee_del')+'</button></td></tr>';
+    }).join('');
+    structHtml += '<h3 class="mt">'+esc(progName(pkeys[p]))+'</h3><table class="tbl"><tr><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th></th></tr>'+rows+'</table>';
+  }
+  var chRows = '';
+  var duesRows = '';
+  var allStu = await DB.all('students');
+  var duesList = [];
+  for(var k=0;k<allStu.length;k++){ var dd = await duesOf(allStu[k].cnic); if(dd>0) duesList.push({s:allStu[k],d:dd}); }
+  duesList.sort(function(a,b){return b.d-a.d;});
+  for(var m2=0;m2<duesList.length;m2++){ var e=duesList[m2];
+    duesRows += '<tr><td><a href="#/student/'+esc(e.s.cnic)+'">'+esc(e.s.name)+'</a></td><td dir="ltr">'+esc(e.s.cnic)+'</td><td dir="ltr">'+esc(e.s.phone||'-')+'</td><td style="text-align:right;font-weight:700;color:var(--red)">'+fmt(e.d)+'</td></tr>'; }
+  if(!duesRows) duesRows = '<tr><td colspan="4" class="mut">'+t('fee_nor')+'</td></tr>';
+  for(var j=0;j<challans.slice(0,60).length;j++){ var c=challans[j], bal=Number(c.amount)-Number(c.paid);
+    chRows += '<tr><td>'+esc(c.no)+'</td><td>'+esc(stuName(c.cnic))+'</td><td>'+esc(c.title)+'</td><td style="text-align:right">'+fmt(c.amount)+'</td><td>'+statusBadge(c.status)+(isOverdue(c)?' <span class="badge b-unpaid">'+t('fee_overdue')+'</span>':'')+'</td>'
+    +'<td><button class="btn sm gh" onclick="printChallan('+c.id+')">'+t('fee_print')+'</button> '
+    +(bal>0?'<a class="btn sm" href="#/fees/pay/'+c.id+'">'+t('fee_pay')+'</a>':'')+'</td></tr>';
+  }
+  return '<div class="card"><div class="between"><h2>'+t('fee_struct')+'</h2><div class="row"><button class="btn sm gold" onclick="seedFees()">'+t('fee_addhead')+' ('+t('fee_struct')+' seed)</button></div></div>'
+  +'<div class="f2 mt"><div class="frow"><label>'+t('s_prog')+'</label><select id="nh_prog">'+progOpts('lhv')+'</select></div>'
+  +'<div class="frow"><label>'+t('fee_head')+'</label><input id="nh_title" placeholder="Admission Fee"></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('fee_amt')+'</label><input id="nh_amt" inputmode="numeric" placeholder="20000"></div><div class="frow"><label>&nbsp;</label><button class="btn" onclick="addHead()">'+t('fee_addhead')+'</button></div></div>'
+  +'<div class="err" id="fhErr"></div><div id="structList">'+(structHtml||'<p class="mut">'+t('fee_nor')+'</p>')+'</div></div>'
+  +'<div class="card"><h2>'+t('fee_gen_month')+'</h2><div class="f2"><div class="frow"><label>'+t('f_session')+'</label><select id="gm_ses">'+await sesOpts()+'</select></div>'
+  +'<div class="frow"><label>'+t('fee_head')+'</label><select id="gm_head">'+heads.map(function(hh){return '<option value="'+hh.id+'">'+esc(progName(hh.program))+' — '+esc(hh.title)+' ('+fmt(hh.amount)+')</option>';}).join('')+'</select></div></div>'
+  +'<button class="btn gold" onclick="genMonthly()">'+t('fee_gen_month')+'</button></div>'
+  +'<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2><a class="btn" href="#/fees/new/">'+t('fee_new')+'</a></div>'
+  +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('s_name')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th>'+t('fee_status')+'</th><th></th></tr>'
+  +(chRows||'<tr><td colspan="6" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'
+  +'<div class="card"><h2>'+t('fee_dues')+'</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th></tr>'+duesRows+'</table></div></div>';
+}
+function isOverdue(c){ return c.status!=='paid' && c.due && c.due < today(); }
+async function addHead(){
+  var p=val('nh_prog'), ti=val('nh_title'), am=Number(val('nh_amt').replace(/,/g,''));
+  if(!ti || !(am>0)){ showErr('fhErr', t('f_bad')); return; }
+  await DB.put('feeHeads',{program:p,title:ti,amount:am});
+  render();
+}
+async function delHead(id){ if(!confirm(t('s_confirm_del'))) return; await DB.del('feeHeads',id); render(); }
+async function seedFees(){
+  // seed Admission Fee + Monthly Fee per program from the website's published fees
+  var have = await DB.all('feeHeads');
+  if(have.length && !confirm('Fee heads already exist. Add defaults anyway?')) return;
+  var FEES = {"lhv":["20000","5000"],"cna":["20000","5000"],"cmw":["20000","5000"],"pharm":["10000","4000"],"health-dip":["20000","5000"],"physio":["20000","5000"],"cardio":["20000","5000"],"patho-dip":["20000","5000"],"anes-dip":["20000","5000"],"surg-dip":["20000","5000"],"dialysis":["20000","5000"],"dental-dip":["20000","5000"],"radio":["20000","5000"],"bsn":["100000","120000"],"postrn":["30000","50000"],"bs-health":["25000","40000"],"bs-dental":["25000","40000"],"bs-surg":["25000","40000"],"bs-anes":["25000","40000"],"bs-radio":["25000","40000"],"bs-patho":["25000","40000"],"fsc":["5000","3000"]};
+  for(var k in FEES){
+    var a=Number(FEES[k][0].replace(/,/g,'')), b=Number(FEES[k][1].replace(/,/g,''));
+    await DB.put('feeHeads',{program:k,title:'Admission Fee',amount:a});
+    await DB.put('feeHeads',{program:k,title:'Monthly Fee',amount:b});
+  }
+  render();
+}
+async function vChallanForm(cnic){
+  await warmStuCache();
+  var students = await DB.all('students');
+  var heads = await DB.all('feeHeads');
+  var stuOpts = '<option value="">'+t('fee_select_stu')+'</option>'+students.map(function(s){ return '<option value="'+s.cnic+'"'+(s.cnic===cnic?' selected':'')+'>'+esc(s.name)+' ('+esc(s.cnic)+')</option>'; }).join('');
+  var headOpts = '<option value="">'+t('fee_select_head')+'</option>'+heads.map(function(hh){ return '<option value="'+hh.id+'">'+esc(progName(hh.program))+' — '+esc(hh.title)+' ('+fmt(hh.amount)+')</option>'; }).join('');
+  var d = new Date(); d.setDate(d.getDate()+10);
+  return '<div class="card"><h2>'+t('fee_new')+'</h2><div class="err" id="chErr"></div>'
+  +'<div class="frow"><label>'+t('fee_student')+' <span class="req">*</span></label><select id="ch_stu">'+stuOpts+'</select></div>'
+  +'<div class="frow"><label>'+t('fee_head')+' <span class="req">*</span></label><select id="ch_head">'+headOpts+'</select></div>'
+  +'<div class="frow"><label>'+t('fee_due')+'</label><input type="date" id="ch_due" value="'+d.toISOString().slice(0,10)+'"></div>'
+  +'<div class="row"><button class="btn" onclick="saveChallan()">'+t('fee_create')+'</button><a class="btn gh" href="#/fees">'+t('f_cancel')+'</a></div></div>';
+}
+async function saveChallan(){
+  var cnic=val('ch_stu'), hid=Number(val('ch_head'));
+  if(!cnic||!hid){ showErr('chErr', t('f_bad')); return; }
+  var head=null, heads=await DB.all('feeHeads');
+  for(var i=0;i<heads.length;i++) if(heads[i].id===hid) head=heads[i];
+  if(!head) return;
+  var ex = await DB.byIndex('challans','byStudent',cnic);
+  for(var j=0;j<ex.length;j++) if(ex[j].headId===hid && ex[j].status!=='paid'){ showErr('chErr', t('fee_exists')); return; }
+  var no = await nextNo('CH','chCounter');
+  var s = await DB.get('students',cnic);
+  var id = await DB.put('challans',{no:no,cnic:cnic,headId:hid,program:head.program,title:head.title,amount:head.amount,paid:0,due:val('ch_due')||today(),status:'unpaid',created:today(),sname:s?s.name:'',kind:'fee',month:ym(today())});
+  printChallan(id);
+}
+async function genMonthly(){
+  var sesId = val('gm_ses'), hid = Number(val('gm_head'));
+  if(!sesId || !hid){ toast(t('f_bad')); return; }
+  var head=null, heads=await DB.all('feeHeads');
+  for(var i=0;i<heads.length;i++) if(heads[i].id===hid) head=heads[i];
+  if(!head) return;
+  var m = ym(today()), students = await DB.all('students'), n=0;
+  for(var j=0;j<students.length;j++){
+    var s=students[j];
+    if(String(s.session)!==String(sesId) || s.status!=='active' || s.program!==head.program) continue;
+    var ex = await DB.byIndex('challans','byStudent',s.cnic), dup=false;
+    for(var k=0;k<ex.length;k++) if(ex[k].headId===hid && ex[k].month===m && ex[k].status!=='paid') dup=true;
+    if(dup) continue;
+    var no = await nextNo('CH','chCounter');
+    await DB.put('challans',{no:no,cnic:s.cnic,headId:hid,program:head.program,title:head.title,amount:head.amount,paid:0,due:today(),status:'unpaid',created:today(),sname:s.name,kind:'fee',month:m});
+    n++;
+  }
+  toast(t('fee_gen_done')+': '+n); render();
+}
+async function vFineForm(cnic){
+  await warmStuCache();
+  var s = await DB.get('students',cnic);
+  if(!s) return '<div class="card">'+t('s_nor')+'</div>';
+  return '<div class="card"><h2>'+t('fee_add_fine')+' — '+esc(s.name)+'</h2><div class="err" id="fnErr"></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('fee_fine_amt')+' <span class="req">*</span></label><input id="fn_amt" inputmode="numeric"></div>'
+  +'<div class="frow"><label>'+t('fee_fine_why')+'</label><input id="fn_why" placeholder="..."></div></div>'
+  +'<div class="row"><button class="btn red" onclick="saveFine(\''+esc(cnic)+'\')">'+t('fee_add_fine')+'</button><a class="btn gh" href="#/student/'+esc(cnic)+'">'+t('f_cancel')+'</a></div></div>';
+}
+async function saveFine(cnic){
+  var amt = Number(val('fn_amt').replace(/,/g,''));
+  if(!(amt>0)){ showErr('fnErr', t('f_bad')); return; }
+  var s = await DB.get('students',cnic), no = await nextNo('CH','chCounter');
+  await DB.put('challans',{no:no,cnic:cnic,headId:0,program:s.program,title:t('fh_fine')+(val('fn_why')?' — '+val('fn_why'):''),amount:amt,paid:0,due:today(),status:'unpaid',created:today(),sname:s.name,kind:'fine',month:ym(today())});
+  toast(t('msg_saved'));
+  location.hash = '#/student/'+cnic;
+}
+async function vPayForm(chId){
+  await warmStuCache();
+  var c = await DB.get('challans',chId);
+  if(!c) return '<div class="card">'+t('fee_nor')+'</div>';
+  var bal = Number(c.amount)-Number(c.paid);
+  return '<div class="card"><h2>'+t('fee_pay')+'</h2><div class="err" id="payErr"></div>'
+  +'<p class="mut">'+t('fee_no')+': <b>'+esc(c.no)+'</b> · '+esc(stuName(c.cnic))+' · '+esc(c.title)+'<br>'+t('fee_total_due')+': <b style="color:var(--red)">'+t('cmn_rs')+' '+fmt(bal)+'</b></p>'
+  +'<div class="f2 mt"><div class="frow"><label>'+t('fee_pamt')+' <span class="req">*</span></label><input id="pay_amt" inputmode="numeric" value="'+bal+'"></div>'
+  +'<div class="frow"><label>'+t('fee_date')+'</label><input type="date" id="pay_date" value="'+today()+'"></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('fee_method')+'</label><select id="pay_method"><option value="cash">'+t('fee_cash')+'</option><option value="bank">'+t('fee_bank')+'</option><option value="jazz">'+t('fee_jazz')+'</option><option value="easy">'+t('fee_easy')+'</option></select></div>'
+  +'<div class="frow"><label>'+t('fee_type')+' <span class="req">*</span></label><select id="pay_head">'+headOpts(c.head||'tuition')+'</select></div></div>'
+  +'<div class="frow"><label>'+t('fee_by')+'</label><input id="pay_by" placeholder="..."></div>'
+  +'<div class="row"><button class="btn" onclick="savePayment('+chId+','+bal+')">'+t('fee_submit')+'</button><a class="btn gh" href="#/fees">'+t('f_cancel')+'</a></div></div>';
+}
+async function savePayment(chId, bal){
+  var amt = Number(val('pay_amt').replace(/,/g,''));
+  if(!(amt>0) || amt>bal){ showErr('payErr', t('f_bad')); return; }
+  var recNo = await nextNo('REC','recCounter');
+  var c = await DB.get('challans',chId);
+  var pid = await DB.put('payments',{recNo:recNo,challanId:chId,cnic:c.cnic,amount:amt,date:val('pay_date')||today(),method:val('pay_method'),head:val('pay_head'),by:val('pay_by')});
+  c.paid = Number(c.paid)+amt;
+  c.status = c.paid>=Number(c.amount) ? 'paid' : 'partial';
+  await DB.put('challans',c);
+  toast(t('msg_saved'));
+  printReceipt(pid);
+}
+/* ----- printable documents ----- */
+async function instName(){ return await setting('instName','Khalil Institute'); }
+async function printChallan(id){
+  await warmStuCache();
+  var c = await DB.get('challans',id); if(!c) return;
+  var s = await DB.get('students',c.cnic);
+  var bal = Number(c.amount)-Number(c.paid);
+  var L = LANG==='ur';
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><h1>'+esc(await instName())+'</h1>'
+  +'<div>'+(L?'فیس چالان':'Fee Challan')+'</div></div><div class="dh"></div>'
+  +'<table><tr><th>'+(L?'چالان نمبر':'Challan No')+'</th><td>'+esc(c.no)+'</td><th>'+(L?'تاریخ':'Date')+'</th><td>'+esc(c.created)+'</td></tr>'
+  +'<tr><th>'+(L?'نام':'Name')+'</th><td>'+esc(s?s.name:c.cnic)+'</td><th>'+(L?'شناختی کارڈ':'CNIC')+'</th><td dir="ltr">'+esc(c.cnic)+'</td></tr>'
+  +'<tr><th>'+(L?'پروگرام':'Program')+'</th><td>'+esc(progName(c.program))+'</td><th>'+(L?'آخری تاریخ':'Due Date')+'</th><td>'+esc(c.due)+'</td></tr></table>'
+  +'<table><tr><th>'+(L?'تفصیل':'Description')+'</th><th>'+(L?'رقم':'Amount (Rs)')+'</th></tr>'
+  +(c.kind==='fine'?'<tr><td colspan="2"><b>'+t('fh_fine')+'</b></td></tr>':'')
+  +'<tr><td>'+esc(c.title)+'</td><td class="amt">'+fmt(c.amount)+'</td></tr>'
+  +'<tr><td>'+(L?'ادا شدہ':'Paid')+'</td><td>'+fmt(c.paid)+'</td></tr>'
+  +'<tr><td><b>'+(L?'بقایا':'Balance Due')+'</b></td><td class="amt">'+fmt(bal)+'</td></tr></table>'
+  +'<p>'+(L?'بینک / جیز کیش / ایزی پیسہ کے ذریعے ادائیگی کریں اور رسید حاصل کریں۔':'Pay via bank / JazzCash / EasyPaisa and collect your receipt.')+'</p>'
+  +'<div class="sig"><div>___________<br>'+(L?'دستخط (وصول کنندہ)':'Signature (Receiver)')+'</div><div>___________<br>'+(L?'مہر':'Stamp')+'</div></div></div>';
+  window.print();
+}
+async function printReceipt(pid){
+  await warmStuCache();
+  var p = await DB.get('payments',pid); if(!p) return;
+  var c = await DB.get('challans',p.challanId);
+  var s = await DB.get('students',p.cnic);
+  var L = LANG==='ur';
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><h1>'+esc(await instName())+'</h1>'
+  +'<div>'+(L?'فیس رسید':'Fee Receipt')+'</div></div><div class="dh"></div>'
+  +'<table><tr><th>'+(L?'رسید نمبر':'Receipt No')+'</th><td>'+esc(p.recNo)+'</td><th>'+(L?'تاریخ':'Date')+'</th><td>'+esc(p.date)+'</td></tr>'
+  +'<tr><th>'+(L?'نام':'Received From')+'</th><td>'+esc(s?s.name:p.cnic)+'</td><th>'+(L?'شناختی کارڈ':'CNIC')+'</th><td dir="ltr">'+esc(p.cnic)+'</td></tr>'
+  +'<tr><th>'+(L?'بابت':'Against')+'</th><td>'+esc(c?c.title:'')+' ('+esc(c?c.no:'')+')</td><th>'+(L?'طریقہ':'Method')+'</th><td>'+esc(methodName(p.method))+'</td></tr></table>'
+  +'<p class="amt">'+(L?'وصول شدہ رقم: ':'Amount Received: ')+t('cmn_rs')+' '+fmt(p.amount)+'</p>'
+  +'<div class="sig"><div>___________<br>'+esc(p.by||'')+'<br>'+(L?'وصول کنندہ':'Received By')+'</div><div>___________<br>'+(L?'مہر':'Stamp')+'</div></div></div>';
+  window.print();
+}
+
+/* ---------- reports ---------- */
+async function vReports(){
+  await warmStuCache();
+  var m = (location.hash.match(/#\/reports\/(.+)/)||[])[1] || ym(today());
+  var payments = await DB.all('payments');
+  var mp = payments.filter(function(p){ return ym(p.date)===m; });
+  var total=0, byM={};
+  for(var i=0;i<mp.length;i++){ total+=Number(mp[i].amount)||0; var k=mp[i].method; byM[k]=(byM[k]||0)+Number(mp[i].amount); }
+  var byMRows = Object.keys(byM).map(function(k){ return '<tr><td>'+esc(methodName(k))+'</td><td style="text-align:right">'+fmt(byM[k])+'</td></tr>'; }).join('');
+  var payRows = mp.map(function(p){ return '<tr><td dir="ltr">'+esc(p.date)+'</td><td>'+esc(p.recNo)+'</td><td>'+esc(stuName(p.cnic))+'</td><td style="text-align:right">'+fmt(p.amount)+'</td><td>'+esc(methodName(p.method))+'</td></tr>'; }).join('');
+  // defaulters
+  var students = await DB.all('students'), defs=[];
+  for(var j=0;j<students.length;j++){ var d=await duesOf(students[j].cnic); if(d>0) defs.push({s:students[j],d:d}); }
+  defs.sort(function(a,b){return b.d-a.d;});
+  var defRows = defs.map(function(e){ return '<tr><td><a href="#/student/'+esc(e.s.cnic)+'">'+esc(e.s.name)+'</a></td><td dir="ltr">'+esc(e.s.cnic)+'</td><td dir="ltr">'+esc(e.s.phone||'-')+'</td><td>'+esc(progName(e.s.program))+'</td><td style="text-align:right;font-weight:700;color:var(--red)">'+fmt(e.d)+'</td></tr>'; }).join('');
+  // enrollment
+  var enr={};
+  for(var k2=0;k2<students.length;k2++){ var pk=students[k2].program; enr[pk]=(enr[pk]||0)+1; }
+  var enrRows = Object.keys(enr).sort().map(function(pk){ return '<tr><td>'+esc(progName(pk))+'</td><td style="text-align:right">'+enr[pk]+'</td></tr>'; }).join('');
+  var yr = m.slice(0,4), yTot=0;
+  for(var yi=0;yi<payments.length;yi++) if(String(payments[yi].date).slice(0,4)===yr) yTot+=Number(payments[yi].amount)||0;
+  var challAll = await DB.all('challans');
+  var outM=0, outRows='';
+  for(var ci=0;ci<challAll.length;ci++){ var cc=challAll[ci], b2=Number(cc.amount)-Number(cc.paid);
+    if(b2>0 && ym(cc.created)===m){ outM+=b2; } }
+  return '<div class="card"><h2>'+t('rep_coll')+'</h2><div class="frow" style="max-width:220px"><label>'+t('rep_month')+'</label><input type="month" id="repM" value="'+m+'" onchange="location.hash=\'#/reports/\'+this.value"></div>'
+  +'<div class="grid g4"><div class="stat"><div class="n">'+fmt(total)+'</div><div class="l">'+t('rep_total')+' ('+m+')</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(yTot)+'</div><div class="l">'+t('rep_total')+' ('+yr+')</div></div>'
+  +'<div class="stat"><div class="n" style="color:var(--red)">'+fmt(outM)+'</div><div class="l">'+t('fee_dues')+' ('+m+')</div></div></div>'
+
+  +'<h3 class="mt">'+t('rep_bymethod')+'</h3><table class="tbl"><tr><th>'+t('fee_method')+'</th><th style="text-align:right">'+t('rep_total')+'</th></tr>'+(byMRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table>'
+  +'<h3 class="mt">Payments</h3><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th>'+t('fee_method')+'</th></tr>'+(payRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
+  +'<div class="card"><h2>'+t('rep_def')+' ('+defs.length+')</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_due')+'</th></tr>'+(defRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
+  +'<div class="card"><h2>'+t('rep_enroll')+'</h2><table class="tbl"><tr><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_count')+'</th></tr>'+(enrRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>';
+}
+
+/* ---------- backup ---------- */
+function vBackup(){
+  return '<div class="card"><h2>'+t('bak_title')+'</h2><div class="ok" id="bakOk"></div><div class="err" id="bakErr"></div>'
+  +'<h3>'+t('bak_exp')+'</h3><p class="mut">'+t('bak_exp_d')+'</p><p class="mt"><button class="btn" onclick="exportBackup()">'+t('bak_exp')+'</button></p>'
+  +'<h3 class="mt">'+t('bak_imp')+'</h3><p class="mut">'+t('bak_imp_d')+'</p><p class="mt"><input type="file" id="impFile" accept=".json,.kinbak" onchange="importBackup(this)"></p>'
+  +'<h3 class="mt">'+t('bak_bydate')+'</h3><p class="mut">'+t('bak_bydate_d')+'</p><div class="row mt"><input type="date" id="bak_date" value="'+today()+'" style="padding:9px;border:1.5px solid var(--line);border-radius:9px;color:#1f2d3d;background:#fff"><button class="btn gh" onclick="backupByDate()">'+t('bak_exp')+'</button></div>'
+  +'</div>'
+  +'<div class="card"><h2>'+t('bak_drive')+'</h2><p class="mut">'+t('bak_drive_d')+'</p><p class="mut mt">'+t('bak_enc')+'</p>'
+  +'<div class="row mt"><button class="btn gh" onclick="driveAuth()">'+t('bak_connect')+'</button><button class="btn gold" onclick="driveBackupNow()">'+t('bak_now')+'</button><span id="drvStat" class="mut"></span></div></div>';
+}
+async function backupJSON(){
+  var data={};
+  var stores=['students','feeHeads','challans','payments','settings','sessions','employees','attendance','expenses','users'];
+  for(var i=0;i<stores.length;i++) data[stores[i]]=await DB.all(stores[i]);
+  data._meta={app:'kin-mis',v:1,date:today()};
+  return JSON.stringify(data);
+}
+function downloadFile(name,text,mime){
+  var b=new Blob([text],{type:mime||'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},4000);
+}
+async function exportBackup(){ downloadFile('kin-backup-'+today()+'.json', await backupJSON()); showOk('bakOk',t('bak_done')); }
+function b64enc(u8){ var s=''; for(var i=0;i<u8.length;i+=8192) s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192)); return btoa(s); }
+function b64dec(s){ var b=atob(s), u=new Uint8Array(b.length); for(var i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+async function encKey(pass,salt){
+  var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:salt,iterations:120000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encBackup(pass){
+  var salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  var key=await encKey(pass,salt);
+  var ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv:iv},key,new TextEncoder().encode(await backupJSON())));
+  var out=new Uint8Array(28+ct.length); out.set(salt,0); out.set(iv,16); out.set(ct,28);
+  return b64enc(out);
+}
+async function decBackup(enc,pass){
+  var raw=b64dec(enc), salt=raw.slice(0,16), iv=raw.slice(16,28), ct=raw.slice(28);
+  var key=await encKey(pass,salt);
+  var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct);
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function importBackup(inp){
+  var f=inp.files[0]; if(!f) return;
+  try{
+    var text=await f.text(), data=null;
+    try{ data=JSON.parse(text); }catch(e){
+      var pass=prompt('Backup password:'); if(!pass){ inp.value=''; return; }
+      data=await decBackup(text,pass);
+    }
+    if(!data || !data._meta || data._meta.app!=='kin-mis') throw new Error('bad file');
+    if(!confirm(t('bak_confirm'))){ inp.value=''; return; }
+    var stores=['students','feeHeads','challans','payments','settings','sessions','employees','attendance','expenses','users'];
+    for(var i=0;i<stores.length;i++){ await DB.clear(stores[i]); var rs=data[stores[i]]||[]; for(var j=0;j<rs.length;j++) await DB.put(stores[i],rs[j]); }
+    await ensureAuth(); _stuCache={};
+    showOk('bakOk',t('bak_restored'));
+  }catch(err){ showErr('bakErr', 'Restore failed: '+err.message); }
+  inp.value='';
+}
+/* google drive (lazy-loaded; needs internet + client id in settings) */
+function loadScript(src){ return new Promise(function(res,rej){ var s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+var driveToken=null;
+async function driveAuth(){
+  var cid=(await setting('driveClientId','')).trim();
+  if(!cid){ alert(t('bak_need')); go('settings'); return null; }
+  if(!navigator.onLine){ alert(t('bak_offline')); return null; }
+  try{
+    if(!window.google) await loadScript('https://accounts.google.com/gsi/client');
+    var tok=await new Promise(function(res,rej){
+      try{
+        var tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/drive.file',
+          callback:function(r){ if(r.access_token) res(r.access_token); else rej(new Error('auth')); },
+          error_callback:function(){ rej(new Error('auth')); }});
+        tc.requestAccessToken();
+      }catch(e){ rej(e); }
+    });
+    driveToken=tok;
+    var el=document.getElementById('drvStat'); if(el) el.textContent='✓ Google Drive';
+    return tok;
+  }catch(e){ alert('Drive sign-in failed.'); return null; }
+}
+async function driveBackupNow(){
+  var tok=driveToken||await driveAuth(); if(!tok) return;
+  var pass=await setting('bakPass','');
+  if(!pass){ alert('Set a backup password in Settings first.'); go('settings'); return; }
+  try{
+    var enc=await encBackup(pass);
+    var meta={name:'kin-backup-'+today()+'.kinbak',mimeType:'application/octet-stream'};
+    var fd=new FormData();
+    fd.append('metadata',new Blob([JSON.stringify(meta)],{type:'application/json'}));
+    var raw=b64dec(enc); fd.append('file',new Blob([raw],{type:'application/octet-stream'}));
+    var r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+tok},body:fd});
+    if(!r.ok) throw new Error('upload '+r.status);
+    showOk('bakOk',t('bak_ok'));
+  }catch(e){ showErr('bakErr','Drive upload failed: '+e.message); }
+}
+
+/* ---------- settings ---------- */
+async function vSettings(){
+  var must = await setting('mustChange','0')==='1';
+  return '<div class="card"><h2>'+t('set_title')+'</h2><div class="ok" id="setOk"></div>'
+  +(must?'<div class="err" style="display:block">'+t('login_hint')+'</div>':'')
+  +'<div class="frow"><label>'+t('set_inst')+'</label><input id="set_inst" value="'+esc(await setting('instName',''))+'"></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('set_pass')+'</label>'+pwField('set_pass',t('set_new'))+'</div>'
+  +'<div class="frow"><label>'+t('set_bakpass')+'</label>'+pwField('set_bakpass','****')+'</div></div>'
+  +'<div class="frow"><label>'+t('set_client')+'</label><input id="set_client" value="'+esc(await setting('driveClientId',''))+'" placeholder="xxxx.apps.googleusercontent.com" dir="ltr"></div>'
+  +'<button class="btn" onclick="saveSettings()">'+t('set_save')+'</button></div>'
+  +(await vUsers())+'<div class="card"><h2 style="color:var(--red)">'+t('set_wipe')+'</h2><p class="mut">'+t('set_wipe_c')+'</p>'
+  +'<div class="row mt"><input id="wipeBox" class="search" style="max-width:200px;color:#1f2d3d;background:#fff" placeholder="DELETE" dir="ltr"><button class="btn red" onclick="wipeAll()">'+t('set_wipe_b')+'</button></div></div>';
+}
+async function saveSettings(){
+  await setSetting('instName', val('set_inst'));
+  await setSetting('driveClientId', val('set_client').trim());
+  await setSetting('bakPass', val('set_bakpass'));
+  var np = val('set_pass');
+  if(np){
+    if(np.length<4){ alert('Password too short'); return; }
+    var u = await curUser();
+    if(u){ u.passHash = await sha(np); await DB.put('users', u); _curUser = u; }
+    await setSetting('mustChange','0');
+  }
+  showOk('setOk', t('set_saved'));
+  toast(t('msg_saved'));
+}
+async function wipeAll(){
+  if(val('wipeBox')!=='DELETE'){ alert('Type DELETE to confirm'); return; }
+  if(!confirm(t('s_confirm_del'))) return;
+  var stores=['students','feeHeads','challans','payments','settings','sessions','employees','attendance','expenses','users'];
+  for(var i=0;i<stores.length;i++) await DB.clear(stores[i]);
+  sessionStorage.removeItem('kin_user'); _curUser=null;
+  location.hash='#/login'; location.reload();
+}
+
+/* ---------- init ---------- */
+document.documentElement.lang = LANG==='ur'?'ur':'en';
+document.documentElement.dir = LANG==='ur'?'rtl':'ltr';
+(async function(){
+  try{ await DB.open(); }catch(e){ document.getElementById('app').innerHTML='<div class="card"><div class="err" style="display:block">Database error: '+esc(e.message||e)+'<br>Use Chrome or Edge.</div></div>'; return; }
+  await ensureAuth();
+  if(!location.hash) location.hash='#/dash';
+  render();
+})();
+
+/* ---------- HR ---------- */
+async function vHR(){
+  var emps = await DB.all('employees');
+  var rows = emps.map(function(e){
+    return '<tr><td>'+esc(e.name)+'</td><td>'+esc(e.father||'-')+'</td><td dir="ltr">'+esc(e.cnic)+'</td><td dir="ltr">'+esc(e.phone||'-')+'</td><td>'+esc(e.desig||'-')+'</td><td style="text-align:right">'+fmt(e.salary||0)+'</td><td dir="ltr">'+esc(e.joining||'-')+'</td>'
+    +'<td><button class="btn sm gh" onclick="empForm(\''+esc(e.cnic)+'\')">'+t('s_edit')+'</button> <button class="btn sm red" onclick="delEmp(\''+esc(e.cnic)+'\')">'+t('s_del')+'</button></td></tr>';
+  }).join('');
+  return '<div class="card"><div class="between"><h2>'+t('hr_title')+'</h2><button class="btn" onclick="empForm(\'\')">'+t('hr_add')+'</button></div>'
+  +'<div id="empFormWrap"></div>'
+  +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('hr_name')+'</th><th>'+t('f_father')+'</th><th>'+t('hr_cnic')+'</th><th>'+t('hr_phone')+'</th><th>'+t('hr_desig')+'</th><th style="text-align:right">'+t('hr_salary')+'</th><th>'+t('hr_join')+'</th><th></th></tr>'
+  +(rows||'<tr><td colspan="8" class="mut">'+t('hr_nor')+'</td></tr>')+'</table></div></div>';
+}
+async function empForm(cnic){
+  var e = cnic ? await DB.get('employees',cnic) : {};
+  if(cnic && !e) return;
+  document.getElementById('empFormWrap').innerHTML = '<div class="card" style="background:#f6faf7"><h2>'+(cnic?t('s_edit'):t('hr_add'))+'</h2><div class="err" id="empErr"></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('hr_name')+' <span class="req">*</span></label><input id="e_name" value="'+esc(e.name||'')+'"></div>'
+  +'<div class="frow"><label>'+t('f_father')+'</label><input id="e_father" value="'+esc(e.father||'')+'"></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('hr_cnic')+' <span class="req">*</span></label><input id="e_cnic" value="'+esc(e.cnic||'')+'" inputmode="numeric" '+(cnic?'disabled':'')+'></div>'
+  +'<div class="frow"><label>'+t('hr_phone')+'</label><input id="e_phone" value="'+esc(e.phone||'')+'" inputmode="tel"></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('hr_desig')+'</label><input id="e_desig" value="'+esc(e.desig||'')+'"></div>'
+  +'<div class="frow"><label>'+t('hr_salary')+'</label><input id="e_salary" inputmode="numeric" value="'+esc(e.salary||'')+'"></div></div>'
+  +'<div class="frow" style="max-width:300px"><label>'+t('hr_join')+'</label><input type="date" id="e_join" value="'+esc(e.joining||today())+'"></div>'
+  +'<div class="row"><button class="btn" onclick="saveEmp(\''+esc(cnic||'')+'\')">'+t('f_save')+'</button><button class="btn gh" onclick="render()">'+t('f_cancel')+'</button></div></div>';
+  document.getElementById('empFormWrap').scrollIntoView({behavior:'smooth'});
+}
+async function saveEmp(oldCnic){
+  var d = {name:val('e_name'), father:val('e_father'), cnic:val('e_cnic').replace(/\D/g,''), phone:val('e_phone').replace(/\D/g,''),
+    desig:val('e_desig'), salary:Number(val('e_salary').replace(/,/g,''))||0, joining:val('e_join')||today(), status:'active'};
+  if(d.name.length<3 || d.cnic.length!==13){ showErr('empErr', t('f_bad')); return; }
+  if(!oldCnic && await DB.get('employees', d.cnic)){ showErr('empErr', t('f_dup')); return; }
+  await DB.put('employees', d);
+  toast(t('hr_saved'));
+  render();
+}
+async function delEmp(cnic){ if(!confirm(t('s_confirm_del'))) return; await DB.del('employees',cnic); render(); }
+
+
+/* ---------- attendance ---------- */
+var _attBuf = {}, _attDate = null, _attSes = '';
+async function vAttendance(sub){
+  var kind = sub==='emp' ? 'emp' : 'stu';
+  var tabs = '<div class="row" style="margin-bottom:14px"><a class="btn sm '+(kind==='stu'?'':'gh')+'" href="#/attendance/stu">'+t('at_stu')+'</a> <a class="btn sm '+(kind==='emp'?'':'gh')+'" href="#/attendance/emp">'+t('at_emp')+'</a></div>';
+  var d = _attDate || today();
+  var list = kind==='stu' ? await DB.all('students') : await DB.all('employees');
+  var sesFilter = kind==='stu' ? '<div class="frow" style="max-width:260px"><label>'+t('f_session')+'</label><select id="att_ses" onchange="_attSes=this.value;render()"><option value="">'+t('ses_select')+'</option>'+await sesOpts(_attSes)+'</select></div>' : '';
+  // existing marks for date
+  var all = await DB.byIndex('attendance','byDate',d);
+  _attBuf = {};
+  for(var i=0;i<all.length;i++) if(all[i].kind===kind) _attBuf[all[i].ref]=all[i].status;
+  var rows = list.filter(function(x){ if(kind==='emp') return true; if(x.status!=='active') return false; if(_attSes && String(x.session)!==String(_attSes)) return false; return true; }).map(function(x){
+    var st = _attBuf[x.cnic]||'P';
+    return '<tr><td>'+esc(x.name)+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><div class="row" style="gap:4px">'
+    +['P','A','L'].map(function(s2){ return '<button class="btn sm '+(st===s2?'':'gh')+'" id="ab_'+x.cnic+'" onclick="attSet(\''+x.cnic+'\',\''+s2+'\')">'+t('at_'+s2.toLowerCase())+'</button>'; }).join('')
+    +'</div></td></tr>';
+  }).join('');
+  return '<div class="card"><h2>'+t('at_title')+'</h2>'+tabs
+  +'<div class="f2"><div class="frow" style="max-width:220px"><label>'+t('at_date')+'</label><input type="date" id="att_date" value="'+d+'" onchange="attDateChg()"></div>'+sesFilter+'</div>'
+  +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('at_present')+'/'+t('at_absent')+'/'+t('at_leave')+'</th></tr>'+(rows||'<tr><td colspan="3" class="mut">'+t('s_nor')+'</td></tr>')+'</table></div>'
+  +'<p class="mt"><button class="btn" onclick="attSave(\''+kind+'\')">'+t('at_save')+'</button></p></div>'
+  +'<div class="card"><h2>'+t('at_summary')+'</h2><div class="frow" style="max-width:220px"><label>'+t('at_month')+'</label><input type="month" id="att_m" value="'+ym(today())+'" onchange="attSummary(\''+kind+'\')"></div><div id="attSum"></div></div>'
+  +'<script>void 0<\/script>';
+}
+function attSet(cnic, st){
+  _attBuf[cnic]=st;
+  var btns = document.querySelectorAll('[id="ab_'+cnic+'"]');
+  var keys = ['P','A','L'];
+  for(var i=0;i<btns.length && i<3;i++) btns[i].className = 'btn sm '+(keys[i]===st?'':'gh');
+}
+function attDateChg(){ _attDate = val('att_date')||today(); _attBuf={}; render(); }
+async function attSave(kind){
+  var d = val('att_date')||today();
+  var old = await DB.byIndex('attendance','byDate',d);
+  for(var i=0;i<old.length;i++) if(old[i].kind===kind) await DB.del('attendance',old[i].id);
+  var n=0;
+  for(var ref in _attBuf){ await DB.put('attendance',{date:d,kind:kind,ref:ref,status:_attBuf[ref]}); n++; }
+  toast(t('at_saved')+': '+n);
+  _attBuf={};
+}
+async function attSummary(kind){
+  var m = val('att_m')||ym(today());
+  var all = await DB.all('attendance');
+  var agg = {};
+  for(var i=0;i<all.length;i++){ var a=all[i]; if(a.kind!==kind||ym(a.date)!==m) continue;
+    agg[a.ref]=agg[a.ref]||{P:0,A:0,L:0}; agg[a.ref][a.status]++; }
+  var names = {};
+  if(kind==='stu') await warmStuCache();
+  else { var es=await DB.all('employees'); for(var j=0;j<es.length;j++) names[es[j].cnic]=es[j].name; }
+  var rows = Object.keys(agg).map(function(ref){
+    var nm = kind==='stu' ? stuName(ref) : (names[ref]||ref);
+    var g=agg[ref], tot=g.P+g.A+g.L;
+    return '<tr><td>'+esc(nm)+'</td><td dir="ltr">'+esc(ref)+'</td><td style="text-align:center">'+g.P+'</td><td style="text-align:center">'+g.A+'</td><td style="text-align:center">'+g.L+'</td><td style="text-align:center">'+tot+'</td></tr>';
+  }).join('');
+  document.getElementById('attSum').innerHTML = '<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th style="text-align:center">'+t('at_p')+'</th><th style="text-align:center">'+t('at_a')+'</th><th style="text-align:center">'+t('at_l')+'</th><th style="text-align:center">'+t('at_total')+'</th></tr>'+(rows||'<tr><td colspan="6" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>';
+}
+
+
+/* ---------- accounts ---------- */
+var EXPCATS = ['stock','books','news','util','rent','salary','other'];
+function expCatName(k){ return t('ac_cat_'+k)||k; }
+async function vAccounts(sub){
+  var exps = await DB.all('expenses');
+  exps.sort(function(a,b){ return b.date<a.date?-1:1; });
+  var expRows = exps.slice(0,50).map(function(e){
+    return '<tr><td dir="ltr">'+esc(e.date)+'</td><td>'+esc(expCatName(e.cat))+'</td><td>'+esc(e.title)+'</td><td style="text-align:right">'+fmt(e.amount)+'</td><td><button class="btn sm red" onclick="delExp('+e.id+')">'+t('fee_del')+'</button></td></tr>';
+  }).join('');
+  return '<div class="card"><h2>'+t('ac_exp')+'</h2>'
+  +'<div class="f2"><div class="frow"><label>'+t('ac_date')+'</label><input type="date" id="ex_date" value="'+today()+'"></div>'
+  +'<div class="frow"><label>'+t('ac_cat')+'</label><select id="ex_cat">'+EXPCATS.map(function(k){return '<option value="'+k+'">'+expCatName(k)+'</option>';}).join('')+'</select></div></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('ac_title_f')+'</label><input id="ex_title" placeholder="..."></div>'
+  +'<div class="frow"><label>'+t('ac_amt')+' <span class="req">*</span></label><input id="ex_amt" inputmode="numeric"></div></div>'
+  +'<button class="btn" onclick="addExp()">'+t('ac_add_exp')+'</button>'
+  +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('ac_date')+'</th><th>'+t('ac_cat')+'</th><th>'+t('ac_title_f')+'</th><th style="text-align:right">'+t('ac_amt')+'</th><th></th></tr>'
+  +(expRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
+  +'<div class="card"><h2>'+t('ac_bal')+'</h2><div class="frow" style="max-width:220px"><label>'+t('ac_day')+'</label><input type="date" id="bal_date" value="'+today()+'" onchange="balSheet()"></div><div id="balOut"></div></div>'
+  +'<div class="card"><h2>'+t('ac_vouchers')+'</h2><div class="f2"><div class="frow"><label>'+t('ac_search')+'</label><input type="month" id="v_m" value="'+ym(today())+'" onchange="vSearch()"></div>'
+  +'<div class="frow"><label>'+t('fee_type')+'</label><select id="v_head" onchange="vSearch()"><option value="">—</option>'+headOpts()+'</select></div></div><div id="vOut"></div></div>';
+}
+async function addExp(){
+  var amt = Number(val('ex_amt').replace(/,/g,''));
+  if(!(amt>0)){ toast(t('f_bad')); return; }
+  await DB.put('expenses',{date:val('ex_date')||today(),cat:val('ex_cat'),title:val('ex_title'),amount:amt});
+  toast(t('msg_saved')); render();
+}
+async function delExp(id){ if(!confirm(t('s_confirm_del'))) return; await DB.del('expenses',id); render(); }
+async function balSheet(){
+  var d = val('bal_date')||today();
+  var pays = await DB.all('payments'), exps = await DB.all('expenses');
+  var inc=0, out=0;
+  for(var i=0;i<pays.length;i++) if(pays[i].date===d) inc+=Number(pays[i].amount)||0;
+  for(var j=0;j<exps.length;j++) if(exps[j].date===d) out+=Number(exps[j].amount)||0;
+  document.getElementById('balOut').innerHTML = '<div class="grid g4">'
+  +'<div class="stat"><div class="n">'+fmt(inc)+'</div><div class="l">'+t('ac_income')+' ('+t('cmn_rs')+')</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(out)+'</div><div class="l">'+t('ac_exp_total')+' ('+t('cmn_rs')+')</div></div>'
+  +'<div class="stat"><div class="n" style="color:'+((inc-out)>=0?'var(--g)':'var(--red)')+'">'+fmt(inc-out)+'</div><div class="l">'+t('ac_balance')+' ('+t('cmn_rs')+')</div></div></div>';
+}
+async function vSearch(){
+  await warmStuCache();
+  var m = val('v_m'), hd = val('v_head');
+  var pays = (await DB.all('payments')).filter(function(p){ return ym(p.date)===m && (!hd || p.head===hd); });
+  pays.sort(function(a,b){ return b.date<a.date?-1:1; });
+  var tot=0, rows = pays.map(function(p){ tot+=Number(p.amount)||0;
+    return '<tr><td dir="ltr">'+esc(p.date)+'</td><td>'+esc(p.recNo)+'</td><td>'+esc(stuName(p.cnic))+'</td><td>'+esc(p.head?headName(p.head):'-')+'</td><td>'+esc(methodName(p.method))+'</td><td style="text-align:right">'+fmt(p.amount)+'</td><td><button class="btn sm gh" onclick="printReceipt('+p.id+')">'+t('fee_print')+'</button></td></tr>';
+  }).join('');
+  document.getElementById('vOut').innerHTML = '<p><b>'+t('rep_total')+': '+t('cmn_rs')+' '+fmt(tot)+'</b> ('+pays.length+')</p>'
+  +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('ac_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th>'+t('fee_type')+'</th><th>'+t('fee_method')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th></th></tr>'
+  +(rows||'<tr><td colspan="7" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>';
+}
+/* date-wise backup */
+async function backupByDate(){
+  var d = val('bak_date')||today();
+  var pays=(await DB.all('payments')).filter(function(p){return p.date===d;});
+  var exps=(await DB.all('expenses')).filter(function(e){return e.date===d;});
+  var att=(await DB.byIndex('attendance','byDate',d));
+  downloadFile('kin-day-'+d+'.json', JSON.stringify({_meta:{app:'kin-mis',v:1,date:d},payments:pays,expenses:exps,attendance:att}));
+  toast(t('bak_done'));
+}
+
+
+/* ---------- users ---------- */
+async function vUsers(){
+  var me = await curUser();
+  if(!me || me.username!=='admin') return '';
+  var users = await DB.all('users');
+  var rows = users.map(function(u){
+    var rn = (u.rights||[]).map(function(m){ var f=MODULES.filter(function(x){return x[0]===m;})[0]; return f?t(f[1]):m; }).join(', ');
+    return '<tr><td dir="ltr">'+esc(u.username)+'</td><td>'+esc(u.name)+'</td><td style="font-size:12px">'+esc(rn)+'</td>'
+    +'<td><button class="btn sm gh" onclick="userForm(\''+esc(u.username)+'\')">'+t('s_edit')+'</button> '
+    +(u.username!==me.username?'<button class="btn sm red" onclick="delUser(\''+esc(u.username)+'\')">'+t('us_del')+'</button>':'')+'</td></tr>';
+  }).join('');
+  return '<div class="card"><div class="between"><h2>'+t('us_title')+'</h2><button class="btn" onclick="userForm(\'\')">'+t('us_add')+'</button></div>'
+  +'<div id="userFormWrap"></div>'
+  +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('us_user')+'</th><th>'+t('us_name')+'</th><th>'+t('us_rights')+'</th><th></th></tr>'+rows+'</table></div></div>';
+}
+async function userForm(username){
+  var u = username ? await DB.get('users',username) : {rights:['dash']};
+  if(username && !u) return;
+  var boxes = MODULES.map(function(m){
+    var on = (u.rights||[]).indexOf(m[0])>=0;
+    return '<label style="display:inline-flex;gap:6px;align-items:center;margin:4px 12px 4px 0;font-weight:400"><input type="checkbox" class="ur_right" value="'+m[0]+'"'+(on?' checked':'')+'> '+t(m[1])+'</label>';
+  }).join('');
+  document.getElementById('userFormWrap').innerHTML = '<div class="card" style="background:#f6faf7"><h2>'+(username?t('s_edit'):t('us_add'))+'</h2><div class="err" id="usrErr"></div>'
+  +'<div class="f2"><div class="frow"><label>'+t('us_user')+' <span class="req">*</span></label><input id="u_user" dir="ltr" value="'+esc(u.username||'')+'" '+(username?'disabled':'')+'></div>'
+  +'<div class="frow"><label>'+t('us_name')+' <span class="req">*</span></label><input id="u_name" value="'+esc(u.name||'')+'"></div></div>'
+  +'<div class="frow"><label>'+t('us_pass')+(username?'':' <span class="req">*</span>')+'</label>'+pwField('u_pass','****')+'</div>'
+  +'<div class="frow"><label>'+t('us_rights')+'</label><div>'+boxes+'</div></div>'
+  +'<div class="row"><button class="btn" onclick="saveUser(\''+esc(username||'')+'\')">'+t('f_save')+'</button><button class="btn gh" onclick="render()">'+t('f_cancel')+'</button></div></div>';
+  document.getElementById('userFormWrap').scrollIntoView({behavior:'smooth'});
+}
+async function saveUser(oldU){
+  var un = val('u_user').toLowerCase().replace(/[^a-z0-9_]/g,''), nm = val('u_name'), pw = val('u_pass');
+  var rights = Array.prototype.slice.call(document.querySelectorAll('.ur_right')).filter(function(c){return c.checked;}).map(function(c){return c.value;});
+  if(!un || nm.length<3 || (!oldU && pw.length<4) || !rights.length){ showErr('usrErr', t('f_bad')); return; }
+  if(!oldU && await DB.get('users',un)){ showErr('usrErr', t('f_dup')); return; }
+  var u = oldU ? await DB.get('users',oldU) : {username:un};
+  u.name = nm; u.rights = rights;
+  if(pw) u.passHash = await sha(pw);
+  else if(!oldU) u.passHash = await sha('1234');
+  await DB.put('users', u);
+  toast(t('us_saved')); render();
+}
+async function delUser(username){
+  var me = await curUser();
+  if(me && me.username===username){ alert(t('us_cannot')); return; }
+  if(!confirm(t('s_confirm_del'))) return;
+  await DB.del('users',username); render();
+}
+
+</script>
+</body>
+</html>
