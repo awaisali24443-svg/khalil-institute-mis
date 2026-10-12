@@ -1175,13 +1175,18 @@ async function loadDemoData(){
   await DB.put('challans',{no:fno,cnic:'3520212345671',headId:0,program:'lhv',title:t('fh_fine')+' — Late submission',amount:500,paid:0,due:todayD,status:'unpaid',created:dAgo(3),sname:'Ayesha Khan',kind:'fine',month:ym(todayD)});
   // employees
   var EMP=[
-    ['Dr. Abdul Wahid','Muhammad Zaman','3520155566671','03001112233','Principal',85000,'2020-03-01'],
-    ['Altaf Falak','Falak Naz','3520166677782','03012223344','Vice Principal',70000,'2021-06-15'],
-    ['Muhammad Shoaib','Abdul Qadir','3520177788893','03023334455','Lecturer',55000,'2022-09-01'],
-    ['Rahat Bibi','Siraj ud Din','3520188899904','03034445566','LHV Instructor',48000,'2023-01-10'],
-    ['Ibrar Ahmad','Zahid Hussain','3520199900015','03045556677','Accountant',52000,'2022-04-20'],
-    ['Sahifi Ullah','Naseeb Ullah','3520100011126','03056667788','Clerk',35000,'2024-07-01']
+    ['Rahat Shah Afridi','-','3520155566671','03001112233','Chief Executive Officer',120000,'2018-01-01'],
+    ['Mr. Sohail Farooq','-','3520166677782','03012223344','Lecturer - Biology',55000,'2020-03-01'],
+    ['Mr. Rahat Rehman','-','3520177788893','03023334455','Lecturer - Pathology',55000,'2020-03-01'],
+    ['Dr. Ibrar Ahmad','-','3520188899904','03034445566','Lecturer - Pharm D',60000,'2019-06-15'],
+    ['Mr. Abdul Wahid','-','3520199900015','03045556677','Lecturer - BSN',55000,'2020-09-01'],
+    ['Mr. Shah Khalid','-','3520100011126','03056667788','Lecturer - English',50000,'2021-01-10'],
+    ['Mr. Altaf Falak','-','3520111122237','03067778899','Lecturer - Computer Science',55000,'2021-06-15'],
+    ['Mr. Shafi Ullah','-','3520122233348','03078889900','Lecturer - Urdu & Pak Study',50000,'2022-09-01']
   ];
+  // hospitals from institute website
+  var HOSPS=['THQ Hospital, Shabqadar','DHQ Hospital, Charsadda','Alkhidmat Hospital'];
+  for(var hi=0;hi<HOSPS.length;hi++) await DB.put('hospitals',{name:HOSPS[hi]});
   for(var e=0;e<EMP.length;e++){
     await DB.put('employees',{name:EMP[e][0],father:EMP[e][1],cnic:EMP[e][2],phone:EMP[e][3],desig:EMP[e][4],salary:EMP[e][5],joining:EMP[e][6],status:'active'});
   }
