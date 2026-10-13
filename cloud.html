@@ -398,7 +398,9 @@ async function render(){
   if(u && u.role==='student' && u.cnic && (h==='#/dash' || h==='#/' || h==='')){ location.hash='#/student/'+u.cnic; return; }
   var r = h.replace('#/','').split('/');
   var _mod = (r[0]==='student'||r[0]==='studentform') ? 'students' : (r[0]==='collect' ? 'fees' : r[0]);
-  if(!hasRight(u, _mod)){ location.hash = '#/'+((u.rights||[])[0]||'dash'); return; }
+  var allowed = hasRight(u, _mod);
+  if(!allowed && u.role==='student' && r[0]==='student' && r[1]===u.cnic) allowed = true;
+  if(!allowed){ location.hash = '#/'+((u.rights||[])[0]||'dash'); return; }
   try{
     if(r[0]==='dash') app.innerHTML = shell(await vDash(),'dash');
     else if(r[0]==='students') app.innerHTML = shell(await vStudents(r[1]||''),'students');
@@ -509,6 +511,7 @@ async function duesOf(cnic){
 async function vDash(){
   await warmStuCache();
   var students = await DB.all('students');
+  if(!students.length){ await new Promise(function(r){setTimeout(r,1200);}); DB._cinv('students'); students = await DB.all('students'); }
   var payments = await DB.all('payments');
   var m = ym(today()), coll=0, dues=0;
   for(var i=0;i<payments.length;i++) if(ym(payments[i].date)===m) coll += Number(payments[i].amount)||0;
@@ -1155,6 +1158,7 @@ document.addEventListener('keydown', function(e){
     if(hasRight(_curUser,'fees')) location.hash = '#/collect';
     return;
   }
+  if(e.key==='Escape' && _kbHelp){ _kbHelp = false; render(); return; }
   if(typing || !_curUser || _kbHelp) return;
   if(e.key==='?'){ e.preventDefault(); showKbHelp(); return; }
   if(e.key==='Escape'){ if(location.hash && location.hash!=='#/dash') location.hash = '#/dash'; return; }
