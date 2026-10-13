@@ -285,10 +285,9 @@ async function ensureAuth(){
 }
 function loggedIn(){ return !!sessionStorage.getItem('kin_token'); }
 async function fetchProfile(uid, email){
-  var rows = await DB.req('GET','/rest/v1/profiles?select=role,cnic,email&id=eq.'+encodeURIComponent(uid));
+  var rows = await DB.req('GET','/rest/v1/profiles?select=role,cnic&id=eq.'+encodeURIComponent(uid));
   if(!rows || !rows.length) throw new Error('auth');
   var p = rows[0];
-  if(!p.email && email){ try{ await DB.req('PATCH','/rest/v1/profiles?id=eq.'+encodeURIComponent(uid), {email: email}); }catch(e){} }
   return {username: email, name: email, email: email, uid: uid, role: p.role||'pending', cnic: p.cnic||'',
           rights: ROLE_RIGHTS[p.role]||ROLE_RIGHTS.pending};
 }
@@ -397,7 +396,7 @@ async function doLogin(e){
     if(_curUser.role==='pending'){ showErr('lgErr', t('login_pending')); doLogout(); return false; }
     if(_curUser.role==='student' && _curUser.cnic){ location.hash = '#/student/'+_curUser.cnic; }
     else location.hash = '#/'+((_curUser.rights||[])[0]||'dash');
-  }catch(err){ showErr('lgErr', 'Login failed: '+String((err&&err.message)||err).slice(0,120)); }
+  }catch(err){ showErr('lgErr', t('login_bad')); }
   return false;
 }
 
@@ -1209,7 +1208,7 @@ async function vUsers(){
   catch(e){ return '<div class="card">'+t('cmn_none')+'</div>'; }
   var rows = profs.map(function(p){
     var opts = ALL_ROLES.map(function(r){ return '<option value="'+r+'"'+(p.role===r?' selected':'')+'>'+r+'</option>'; }).join('');
-    return '<tr><td dir="ltr" style="font-size:12px">'+esc(p.email||p.id.slice(0,8))+'</td>'
+    return '<tr><td dir="ltr" style="font-size:12px">'+esc(p.id.slice(0,8))+'</td>'
     +'<td><select id="rl_'+p.id+'" class="roleSel">'+opts+'</select></td>'
     +'<td><input id="cn_'+p.id+'" dir="ltr" value="'+esc(p.cnic||'')+'" placeholder="CNIC" style="width:150px"></td>'
     +'<td><button class="btn sm" onclick="saveProfileRole(\''+p.id+'\')">'+t('f_save')+'</button></td></tr>';
