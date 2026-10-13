@@ -178,6 +178,7 @@ var LS = {
 /* ---------- database (IndexedDB) ---------- */
 var SB = {
   url: 'https://nheyxozlfjeybzktblmv.supabase.co',
+  reqTimeout: 20000,
   anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oZXl4b3psZmpleWJ6a3RibG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4Nzk2ODUsImV4cCI6MjEwNzQ1NTY4NX0.RZumeHy_fxBakdyECsX9Sy05Vakbb6rJyZzu4mkNNnc',
   token: null
 };
@@ -196,6 +197,7 @@ var DB = {
     var tok = sessionStorage.getItem('kin_token');
     if(tok) SB.token = tok;
   },
+  clearCache: function(){ DB._cache = {}; },
   TABLES: {students:'students',employees:'employees',feeHeads:'fee_heads',challans:'challans',payments:'payments',settings:'settings',sessions:'sessions',attendance:'attendance',expenses:'expenses',subjects:'subjects',timetable:'timetable',exams:'exams',examstu:'exam_students',marks:'marks',letters:'letters',hospitals:'hospitals',trainees:'trainees',visitors:'visitors',events:'events',problems:'problems',cvs:'cvs',books:'books',bookissue:'book_issues',stockcats:'stock_cats',stock:'stock_items'},
   KEYED: {students:1, employees:1},
   IDX: {byStudent:'cnic', byChallan:'challanId', byDate:'date', byExam:'examId'},
@@ -206,8 +208,30 @@ var DB = {
     if(prefer) h['Prefer'] = prefer;
     return h;
   },
-  req: async function(method, path, body, prefer){
-    var r = await fetch(SB.url + path, {method: method, headers: DB.hd(prefer), body: body?JSON.stringify(body):undefined});
+  _cache: {},
+  _cacheTTL: 30000,
+  _cget: function(t){ var c = DB._cache[t]; return (c && (Date.now()-c.ts) < DB._cacheTTL) ? c.rows : null; },
+  _cset: function(t, rows){ DB._cache[t] = {ts: Date.now(), rows: rows}; },
+  _cinv: function(t){ delete DB._cache[t]; },
+  req: async function(method, path, body, prefer, _retried){
+    var ctrl = new AbortController();
+    var to = setTimeout(function(){ ctrl.abort(); }, SB.reqTimeout);
+    var r;
+    try{
+      r = await fetch(SB.url + path, {method: method, headers: DB.hd(prefer), body: body?JSON.stringify(body):undefined, signal: ctrl.signal});
+    }catch(e){
+      clearTimeout(to);
+      if(!_retried && (e.name==='AbortError' || e.name==='TypeError')){
+        await new Promise(function(res){ setTimeout(res, 800); });
+        return DB.req(method, path, body, prefer, true);
+      }
+      throw new Error('net');
+    }
+    clearTimeout(to);
+    if(r.status===401 && SB.token && !_retried){
+      if(await refreshSession()) return DB.req(method, path, body, prefer, true);
+      throw new Error('auth');
+    }
     if(r.status===401 || r.status===403){ throw new Error('auth'); }
     var txt = await r.text();
     var j = null;
@@ -221,9 +245,14 @@ var DB = {
     return d;
   },
   all: async function(n){
+    var t = DB.T(n);
+    var hit = DB._cget(t);
+    if(hit) return hit;
     var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
-    var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?select='+sel);
-    return (rows||[]).map(DB.withId);
+    var rows = await DB.req('GET', '/rest/v1/'+t+'?select='+sel);
+    var out = (rows||[]).map(DB.withId);
+    DB._cset(t, out);
+    return out;
   },
   get: async function(n,k){
     if(k===undefined||k===null||k==='') return null;
@@ -237,6 +266,7 @@ var DB = {
   },
   put: async function(n,v){
     var t = DB.T(n);
+    DB._cinv(t);
     if(DB.KEYED[n]){
       await DB.req('POST', '/rest/v1/'+t, {key: v.cnic, data: v}, 'resolution=merge-duplicates');
       return v.cnic;
@@ -258,12 +288,14 @@ var DB = {
   },
   del: async function(n,k){
     var t = DB.T(n), q;
+    DB._cinv(t);
     if(DB.KEYED[n]) q = '?key=eq.'+encodeURIComponent(k);
     else if(n==='settings') q = '?data->>k=eq.'+encodeURIComponent(k);
     else q = '?id=eq.'+encodeURIComponent(k);
     await DB.req('DELETE', '/rest/v1/'+t+q);
   },
   clear: async function(n){
+    DB._cinv(DB.T(n));
     await DB.req('DELETE', '/rest/v1/'+DB.T(n)+'?id=not.is.null');
   },
   byIndex: async function(n,idx,val){
@@ -284,6 +316,22 @@ async function ensureAuth(){
   }catch(e){ /* pre-login boot: anon cannot write settings (RLS); safe to skip */ }
 }
 function loggedIn(){ return !!sessionStorage.getItem('kin_token'); }
+async function refreshSession(){
+  var rt = sessionStorage.getItem('kin_refresh');
+  if(!rt) return false;
+  try{
+    var r = await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',
+      {method:'POST', headers:{'apikey':SB.anon,'Content-Type':'application/json'},
+       body: JSON.stringify({refresh_token: rt})});
+    if(!r.ok) return false;
+    var j = await r.json();
+    SB.token = j.access_token;
+    sessionStorage.setItem('kin_token', j.access_token);
+    if(j.refresh_token) sessionStorage.setItem('kin_refresh', j.refresh_token);
+    if(_curUser) _curUser._tok = j.access_token;
+    return true;
+  }catch(e){ return false; }
+}
 async function fetchProfile(uid, email){
   var rows = await DB.req('GET','/rest/v1/profiles?select=role,cnic&id=eq.'+encodeURIComponent(uid));
   if(!rows || !rows.length) throw new Error('auth');
@@ -322,8 +370,8 @@ function shell(inner, active){
 }
 async function doLogout(){
   try{ await fetch(SB.url+'/auth/v1/logout', {method:'POST', headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||SB.anon)}}); }catch(e){}
-  _curUser=null; SB.token=null;
-  sessionStorage.removeItem('kin_token'); sessionStorage.removeItem('kin_uid'); sessionStorage.removeItem('kin_email');
+  _curUser=null; SB.token=null; DB.clearCache();
+  sessionStorage.removeItem('kin_token'); sessionStorage.removeItem('kin_refresh'); sessionStorage.removeItem('kin_uid'); sessionStorage.removeItem('kin_email');
   location.hash='#/login';
 }
 function go(r){ location.hash = '#/'+r; }
@@ -374,11 +422,13 @@ function vLogin(){
   +'<form onsubmit="return doLogin(event)">'
   +'<div class="frow" style="text-align:left"><label>'+t('login_user')+'</label><input id="lgUser" autocomplete="username" dir="ltr" autofocus></div>'
   +'<div class="frow" style="text-align:left"><label>'+t('login_pass')+'</label>'+pwField('lgPass')+'</div>'
-  +'<button class="btn" type="submit" style="width:100%">'+t('login_btn')+'</button></form>'
+  +'<button class="btn" type="submit" id="lgBtn" style="width:100%">'+t('login_btn')+'</button></form>'
   +'<div class="hint">'+t('login_hint')+'</div></div></div>';
 }
 async function doLogin(e){
   e.preventDefault();
+  var btn = document.getElementById('lgBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '…'; }
   try{
     var em = val('lgUser').trim(), pw = val('lgPass');
     if(!em || !pw){ showErr('lgErr', t('login_bad')); return false; }
@@ -389,6 +439,7 @@ async function doLogin(e){
     if(!r.ok) throw new Error(j.msg || j.error_description || t('login_bad'));
     SB.token = j.access_token;
     sessionStorage.setItem('kin_token', j.access_token);
+    if(j.refresh_token) sessionStorage.setItem('kin_refresh', j.refresh_token);
     sessionStorage.setItem('kin_uid', j.user.id);
     sessionStorage.setItem('kin_email', j.user.email);
     _curUser = await fetchProfile(j.user.id, j.user.email);
@@ -397,6 +448,7 @@ async function doLogin(e){
     if(_curUser.role==='student' && _curUser.cnic){ location.hash = '#/student/'+_curUser.cnic; }
     else location.hash = '#/'+((_curUser.rights||[])[0]||'dash');
   }catch(err){ showErr('lgErr', t('login_bad')); }
+  if(btn){ btn.disabled = false; btn.textContent = t('login_btn'); }
   return false;
 }
 
