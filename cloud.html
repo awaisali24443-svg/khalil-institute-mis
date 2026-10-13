@@ -251,7 +251,7 @@ var DB = {
     var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
     var rows = await DB.req('GET', '/rest/v1/'+t+'?select='+sel);
     var out = (rows||[]).map(DB.withId);
-    DB._cset(t, out);
+    if(out.length) DB._cset(t, out);
     return out;
   },
   get: async function(n,k){
@@ -379,6 +379,7 @@ function go(r){ location.hash = '#/'+r; }
 async function render(){
   var app = document.getElementById('app');
   var h = location.hash || '#/dash';
+  if(h !== '#/login') app.innerHTML = '<div class="wrap"><div class="card"><p class="mut">Loading…</p></div></div>';
   var u = await curUser();
   if(!u && h!=='#/login'){ location.hash='#/login'; return; }
   if(h==='#/login'){ if(u){ location.hash='#/'+((u.rights||[])[0]||'dash'); return; } app.innerHTML = vLogin(); return; }
