@@ -382,7 +382,7 @@ function shell(inner, active){
 }
 async function doLogout(){
   try{ await fetch(SB.url+'/auth/v1/logout', {method:'POST', headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||SB.anon)}}); }catch(e){}
-  _curUser=null; SB.token=null; DB.clearCache();
+  _curUser=null; SB.token=null; DB.clearCache(); _kbHelp=false;
   sessionStorage.removeItem('kin_token'); sessionStorage.removeItem('kin_refresh'); sessionStorage.removeItem('kin_uid'); sessionStorage.removeItem('kin_email');
   location.hash='#/login';
 }
