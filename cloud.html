@@ -210,9 +210,15 @@ var DB = {
     if(!r.ok) throw new Error((j&&j.message)||('HTTP '+r.status));
     return j;
   },
+  withId: function(row){
+    var d = (row && row.data) || {};
+    if(row && row.id!==undefined && d.id===undefined) d.id = row.id;
+    return d;
+  },
   all: async function(n){
-    var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?select=data');
-    return (rows||[]).map(function(x){ return x.data; });
+    var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
+    var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?select='+sel);
+    return (rows||[]).map(DB.withId);
   },
   get: async function(n,k){
     if(k===undefined||k===null||k==='') return null;
@@ -220,8 +226,9 @@ var DB = {
     if(DB.KEYED[n]) q = '/rest/v1/'+DB.T(n)+'?key=eq.'+encodeURIComponent(k)+'&select=data&limit=1';
     else if(n==='settings') q = '/rest/v1/'+DB.T(n)+'?data->>k=eq.'+encodeURIComponent(k)+'&select=data&limit=1';
     else q = '/rest/v1/'+DB.T(n)+'?id=eq.'+encodeURIComponent(k)+'&select=data&limit=1';
-    var rows = await DB.req('GET', q);
-    return (rows&&rows[0]) ? rows[0].data : null;
+    var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
+    var rows = await DB.req('GET', q.replace('select=data','select='+sel));
+    return (rows&&rows[0]) ? DB.withId(rows[0]) : null;
   },
   put: async function(n,v){
     var t = DB.T(n);
@@ -256,8 +263,9 @@ var DB = {
   },
   byIndex: async function(n,idx,val){
     var f = DB.IDX[idx]||'cnic';
-    var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?data->>'+f+'=eq.'+encodeURIComponent(val)+'&select=data');
-    return (rows||[]).map(function(x){ return x.data; });
+    var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
+    var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?data->>'+f+'=eq.'+encodeURIComponent(val)+'&select='+sel);
+    return (rows||[]).map(DB.withId);
   }
 };
 async function setting(k,def){ var s = await DB.get('settings',k); return s ? s.v : def; }
