@@ -191,6 +191,11 @@ var ROLE_RIGHTS = {
 };
 /* Supabase-backed DB: same interface as the old IndexedDB layer (all/get/put/del/byIndex) */
 var DB = {
+  backend:'sb',
+  open: async function(){
+    var tok = sessionStorage.getItem('kin_token');
+    if(tok) SB.token = tok;
+  },
   TABLES: {students:'students',employees:'employees',feeHeads:'fee_heads',challans:'challans',payments:'payments',settings:'settings',sessions:'sessions',attendance:'attendance',expenses:'expenses',subjects:'subjects',timetable:'timetable',exams:'exams',examstu:'exam_students',marks:'marks',letters:'letters',hospitals:'hospitals',trainees:'trainees',visitors:'visitors',events:'events',problems:'problems',cvs:'cvs',books:'books',bookissue:'book_issues',stockcats:'stock_cats',stock:'stock_items'},
   KEYED: {students:1, employees:1},
   IDX: {byStudent:'cnic', byChallan:'challanId', byDate:'date', byExam:'examId'},
