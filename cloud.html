@@ -441,6 +441,7 @@ function loginTab(m){
   if(sf) sf.style.display = m==='student'?'':'none';
   if(tf) tf.style.display = m==='staff'?'':'none';
   var e = document.getElementById('lgErr'); if(e){ e.style.display='none'; e.textContent=''; }
+  var s = document.getElementById('lgSub'); if(s) s.textContent = t('app_sub')+' — '+t(m==='student'?'login_student':'login_staff');
 }
 function fmtCnic(el){
   var d = el.value.replace(/\D/g,'').slice(0,13), out = d;
@@ -449,7 +450,7 @@ function fmtCnic(el){
   el.value = out;
 }
 function vLogin(){
-  return '<div class="loginwrap"><div class="logincard"><img src="'+LOGO+'" style="width:84px;height:84px;object-fit:contain;margin-bottom:6px" alt="logo"><h1>Khalil Institute</h1><p>'+t('app_sub')+' — '+t('login_title')+'</p>'
+  return '<div class="loginwrap"><div class="logincard"><img src="'+LOGO+'" style="width:84px;height:84px;object-fit:contain;margin-bottom:6px" alt="logo"><h1>Khalil Institute</h1><p id="lgSub">'+t('app_sub')+' — '+t('login_student')+'</p>'
   +'<div class="ltabs"><button type="button" id="ltStu" class="ltab on" onclick="loginTab(\'student\')">'+t('login_student')+'</button>'
   +'<button type="button" id="ltStaff" class="ltab" onclick="loginTab(\'staff\')">'+t('login_staff')+'</button></div>'
   +'<div class="err" id="lgErr"></div>'
