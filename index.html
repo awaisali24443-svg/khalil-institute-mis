@@ -47,7 +47,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .req{color:var(--red)}
 .err{background:#fdecea;color:#7f1d1d;border:1px solid #f5c6c2;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:none;font-size:13.5px}
 .ok{background:#e6f4ec;color:var(--gd);border:1px solid #bfe3cf;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:none;font-size:13.5px}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.crumbs{font-size:13px;color:var(--mut);margin-bottom:10px}.crumbs a{color:var(--g);text-decoration:none;font-weight:600}.ph{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--g)}.ph-sm{width:34px;height:34px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:1px solid var(--g)}.ph-ph{width:72px;height:72px;border-radius:50%;background:var(--g);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:26px;font-weight:800}.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
 .b-paid{background:#e6f4ec;color:var(--gd)}.b-unpaid{background:#fdecea;color:#7f1d1d}.b-partial{background:#fff8e1;color:#6b4e00}
 .search{width:100%;max-width:380px;padding:10px 14px;border:1.5px solid var(--line);border-radius:9px;font-size:14px}
 .loginwrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -85,7 +85,7 @@ en:{app_sub:"Management System",nav_dash:"Dashboard",nav_stu:"Students",nav_fee:
 login_title:"Staff Login",login_pass:"Password",login_btn:"Login",login_bad:"Wrong password. Try again.",login_hint:"Default password: khalil123 — change it in Settings after first login.",
 d_total:"Total Students",d_coll:"Collected This Month",d_dues:"Total Dues",d_recent:"Recent Payments",d_add:"Add Student",d_challan:"Fee Challans",d_none:"No payments yet",d_view:"View All",
 s_title:"Students",s_search:"Search name, CNIC or phone…",s_add:"Add Student",s_name:"Name",s_cnic:"CNIC",s_phone:"Phone",s_prog:"Program",s_dues:"Dues (Rs)",s_act:"Actions",s_edit:"Edit",s_del:"Delete",s_pay:"Fees",s_nor:"No students found",s_confirm_del:"Delete this student and ALL their fee records? This cannot be undone.",
-f_name:"Full name",f_father:"Father name",f_gender:"Gender",f_male:"Male",f_female:"Female",f_dob:"Date of birth",f_cnic:"CNIC / B-Form",f_phone:"Mobile",f_wa:"WhatsApp",f_email:"Email",f_dist:"District",f_addr:"Address",f_qual:"Qualification",f_board:"Board",f_marks:"Marks %",f_year:"Passing year",f_prog:"Program",f_src:"Source",f_save:"Save",f_cancel:"Cancel",f_dup:"This CNIC already exists in the system.",f_bad:"Please correct the fields and try again.",f_adm:"Admission date",p_sno:"S. No",p_domicile:"Domicile",p_ssc:"SSC Marks",p_hssc:"HSSC Marks",p_shift:"Shift",p_morning:"Morning",p_evening:"Evening",p_examreg:"Board Reg No",p_duration:"Duration",p_remarks:"Remarks",p_feeplan:"Committed Fee Plan (per student)",p_admfee:"Admission Fee",p_monfee:"Monthly Fee",p_regfee:"Registration Fee",p_examfee:"Exam Fee",p_finefee:"Fine Fee",p_other:"Other",p_totalfees:"Total Fees",p_totalpaid:"Total Paid",p_remaining:"Remaining",p_profile:"Student Profile",p_personal:"Personal Information",p_academic:"Academic Information",p_feestatus:"Fee Status",p_edit:"Edit Profile",p_collect:"Collect Fee",p_payhist:"Challans & Payments",p_attsum:"Attendance Summary",p_present:"Present",p_absent:"Absent",p_print:"Print Profile",f_days:"days",f_status:"Status",f_active:"Active",f_left:"Left",f_done:"Completed",
+f_name:"Full name",f_father:"Father name",f_gender:"Gender",f_male:"Male",f_female:"Female",f_dob:"Date of birth",f_cnic:"CNIC / B-Form",f_phone:"Mobile",f_wa:"WhatsApp",f_email:"Email",f_dist:"District",f_addr:"Address",f_qual:"Qualification",f_board:"Board",f_marks:"Marks %",f_year:"Passing year",f_prog:"Program",f_src:"Source",f_save:"Save",f_cancel:"Cancel",f_dup:"This CNIC already exists in the system.",f_bad:"Please correct the fields and try again.",f_adm:"Admission date",p_sno:"S. No",p_domicile:"Domicile",p_ssc:"SSC Marks",p_hssc:"HSSC Marks",p_shift:"Shift",p_morning:"Morning",p_evening:"Evening",p_examreg:"Board Reg No",p_duration:"Duration",p_remarks:"Remarks",p_feeplan:"Committed Fee Plan (per student)",p_admfee:"Admission Fee",p_monfee:"Monthly Fee",p_regfee:"Registration Fee",p_examfee:"Exam Fee",p_finefee:"Fine Fee",p_other:"Other",p_totalfees:"Total Fees",p_totalpaid:"Total Paid",p_remaining:"Remaining",p_profile:"Student Profile",p_personal:"Personal Information",p_academic:"Academic Information",p_feestatus:"Fee Status",p_edit:"Edit Profile",p_collect:"Collect Fee",p_payhist:"Challans & Payments",p_attsum:"Attendance Summary",p_present:"Present",p_absent:"Absent",p_print:"Print Profile",f_days:"days",p_photo:"Photo",f_status:"Status",f_active:"Active",f_left:"Left",f_done:"Completed",
 fee_title:"Fee Management",fee_struct:"Fee Structure",fee_addhead:"Add Fee Head",fee_head:"Title",fee_amt:"Amount (Rs)",fee_del:"Delete",fee_challans:"Challans",fee_new:"New Challan",fee_student:"Student",fee_due:"Due date",fee_create:"Create Challan",fee_no:"Challan No",fee_status:"Status",fee_unpaid:"Unpaid",fee_partial:"Partial",fee_paid:"Paid",fee_pay:"Record Payment",fee_pamt:"Amount (Rs)",fee_method:"Method",fee_cash:"Cash",fee_bank:"Bank",fee_jazz:"JazzCash",fee_easy:"EasyPaisa",fee_submit:"Save Payment",fee_receipt:"Receipt",fee_print:"Print",fee_dues:"Dues List",fee_total_due:"Total due",fee_nor:"No challans found",fee_overdue:"Overdue",fee_by:"Received by",fee_date:"Date",fee_select_stu:"Select student…",fee_select_head:"Select fee head…",fee_exists:"An unpaid challan for this fee head already exists for this student.",
 rep_title:"Reports",rep_coll:"Fee Collection",rep_month:"Month",rep_total:"Total collected",rep_bymethod:"By method",rep_def:"Defaulters",rep_enroll:"Enrollment by Program",rep_count:"Students",rep_nor:"No data for this period",rep_stu:"Student",rep_prog:"Program",rep_due:"Due (Rs)",rep_from:"From",rep_to:"To",
 bak_title:"Backup",bak_exp:"Download Backup File",bak_exp_d:"Saves ALL data to a file. Copy it to a USB stick for safekeeping.",bak_imp:"Restore from File",bak_imp_d:"Replaces ALL current data with the backup file.",bak_confirm:"This will REPLACE all current data with the file. Continue?",bak_done:"Backup downloaded.",bak_restored:"Data restored successfully.",bak_drive:"Google Drive Backup",bak_drive_d:"Automatic encrypted backup to the institute's Google Drive (needs internet + one-time sign-in).",bak_connect:"Connect Google Drive",bak_now:"Backup to Drive Now",bak_ok:"Uploaded to Drive successfully.",bak_need:"Enter the Google Client ID in Settings first.",bak_offline:"No internet connection — connect and try again.",bak_enc:"Backups are encrypted before upload. Only this institute can read them.",
@@ -105,7 +105,7 @@ ur:{app_sub:"مینجمنٹ سسٹم",nav_dash:"ڈیش بورڈ",nav_stu:"طلب
 login_title:"عملے کا لاگ اِن",login_pass:"پاس ورڈ",login_btn:"لاگ اِن",login_bad:"غلط پاس ورڈ۔ دوبارہ کوشش کریں۔",login_hint:"پہلے سے طے شدہ پاس ورڈ: khalil123 — پہلے لاگ اِن کے بعد ترتیبات میں تبدیل کریں۔",
 d_total:"کل طلبہ",d_coll:"اس ماہ وصول شدہ",d_dues:"کل بقایا جات",d_recent:"حالیہ ادائیگیاں",d_add:"طالب علم شامل کریں",d_challan:"فیس چالانات",d_none:"ابھی کوئی ادائیگی نہیں",d_view:"سب دیکھیں",
 s_title:"طلبہ",s_search:"نام، شناختی کارڈ یا فون تلاش کریں…",s_add:"نیا طالب علم",s_name:"نام",s_cnic:"شناختی کارڈ",s_phone:"فون",s_prog:"پروگرام",s_dues:"بقایا (روپے)",s_act:"عمل",s_edit:"ترمیم",s_del:"حذف",s_pay:"فیس",s_nor:"کوئی طالب علم نہیں ملا",s_confirm_del:"اس طالب علم اور اس کا تمام فیس ریکارڈ حذف کریں؟ یہ واپس نہیں ہوگا۔",
-f_name:"پورا نام",f_father:"والد کا نام",f_gender:"صنف",f_male:"مرد",f_female:"عورت",f_dob:"تاریخ پیدائش",f_cnic:"شناختی کارڈ / ب فارم",f_phone:"موبائل",f_wa:"واٹس ایپ",f_email:"ای میل",f_dist:"ضلع",f_addr:"پتہ",f_qual:"قابلیت",f_board:"بورڈ",f_marks:"نمبرات ٪",f_year:"پاسنگ سال",f_prog:"پروگرام",f_src:"ذریعہ",f_save:"محفوظ کریں",f_cancel:"منسوخ",f_dup:"یہ شناختی کارڈ پہلے سے سسٹم میں موجود ہے۔",f_bad:"براہ کرم خانے درست کر کے دوبارہ کوشش کریں۔",f_adm:"داخلے کی تاریخ",p_sno:"سیریل نمبر",p_domicile:"ڈومیسائل",p_ssc:"میٹرک نمبرات",p_hssc:"انٹر نمبرات",p_shift:"شفٹ",p_morning:"صبح",p_evening:"شام",p_examreg:"بورڈ رجسٹریشن نمبر",p_duration:"دورانیہ",p_remarks:"ریمارکس",p_feeplan:"طے شدہ فیس (فی طالب علم)",p_admfee:"داخلہ فیس",p_monfee:"ماہانہ فیس",p_regfee:"رجسٹریشن فیس",p_examfee:"امتحانی فیس",p_finefee:"جرمانہ فیس",p_other:"دیگر",p_totalfees:"کل فیس",p_totalpaid:"کل ادا شدہ",p_remaining:"بقایا",p_profile:"طالب علم پروفائل",p_personal:"ذاتی معلومات",p_academic:"تعلیمی معلومات",p_feestatus:"فیس کی صورتحال",p_edit:"پروفائل میں ترمیم",p_collect:"فیس وصول کریں",p_payhist:"چالان و ادائیگیاں",p_attsum:"حاضری کا خلاصہ",p_present:"حاضر",p_absent:"غیر حاضر",p_print:"پروفائل پرنٹ کریں",f_days:"دن",f_status:"حالت",f_active:"فعال",f_left:"چھوڑ گیا",f_done:"مکمل",
+f_name:"پورا نام",f_father:"والد کا نام",f_gender:"صنف",f_male:"مرد",f_female:"عورت",f_dob:"تاریخ پیدائش",f_cnic:"شناختی کارڈ / ب فارم",f_phone:"موبائل",f_wa:"واٹس ایپ",f_email:"ای میل",f_dist:"ضلع",f_addr:"پتہ",f_qual:"قابلیت",f_board:"بورڈ",f_marks:"نمبرات ٪",f_year:"پاسنگ سال",f_prog:"پروگرام",f_src:"ذریعہ",f_save:"محفوظ کریں",f_cancel:"منسوخ",f_dup:"یہ شناختی کارڈ پہلے سے سسٹم میں موجود ہے۔",f_bad:"براہ کرم خانے درست کر کے دوبارہ کوشش کریں۔",f_adm:"داخلے کی تاریخ",p_sno:"سیریل نمبر",p_domicile:"ڈومیسائل",p_ssc:"میٹرک نمبرات",p_hssc:"انٹر نمبرات",p_shift:"شفٹ",p_morning:"صبح",p_evening:"شام",p_examreg:"بورڈ رجسٹریشن نمبر",p_duration:"دورانیہ",p_remarks:"ریمارکس",p_feeplan:"طے شدہ فیس (فی طالب علم)",p_admfee:"داخلہ فیس",p_monfee:"ماہانہ فیس",p_regfee:"رجسٹریشن فیس",p_examfee:"امتحانی فیس",p_finefee:"جرمانہ فیس",p_other:"دیگر",p_totalfees:"کل فیس",p_totalpaid:"کل ادا شدہ",p_remaining:"بقایا",p_profile:"طالب علم پروفائل",p_personal:"ذاتی معلومات",p_academic:"تعلیمی معلومات",p_feestatus:"فیس کی صورتحال",p_edit:"پروفائل میں ترمیم",p_collect:"فیس وصول کریں",p_payhist:"چالان و ادائیگیاں",p_attsum:"حاضری کا خلاصہ",p_present:"حاضر",p_absent:"غیر حاضر",p_print:"پروفائل پرنٹ کریں",f_days:"دن",p_photo:"تصویر",f_status:"حالت",f_active:"فعال",f_left:"چھوڑ گیا",f_done:"مکمل",
 fee_title:"فیس مینجمنٹ",fee_struct:"فیس کا تعین",fee_addhead:"نیا فیس ہیڈ",fee_head:"عنوان",fee_amt:"رقم (روپے)",fee_del:"حذف",fee_challans:"چالانات",fee_new:"نیا چالان",fee_student:"طالب علم",fee_due:"آخری تاریخ",fee_create:"چالان بنائیں",fee_no:"چالان نمبر",fee_status:"حالت",fee_unpaid:"غیر ادا شدہ",fee_partial:"جزوی",fee_paid:"ادا شدہ",fee_pay:"ادائیگی درج کریں",fee_pamt:"رقم (روپے)",fee_method:"طریقہ",fee_cash:"نقد",fee_bank:"بینک",fee_jazz:"جیز کیش",fee_easy:"ایزی پیسہ",fee_submit:"ادائیگی محفوظ کریں",fee_receipt:"رسید",fee_print:"پرنٹ",fee_dues:"بقایا جات کی فہرست",fee_total_due:"کل بقایا",fee_nor:"کوئی چالان نہیں ملا",fee_overdue:"میعاد گزری",fee_by:"وصول کنندہ",fee_date:"تاریخ",fee_select_stu:"طالب علم منتخب کریں…",fee_select_head:"فیس ہیڈ منتخب کریں…",fee_exists:"اس طالب علم کے لیے اس فیس ہیڈ کا غیر ادا شدہ چالان پہلے سے موجود ہے۔",
 rep_title:"رپورٹس",rep_coll:"فیس وصولی",rep_month:"مہینہ",rep_total:"کل وصول شدہ",rep_bymethod:"طریقے کے لحاظ سے",rep_def:"نادہندگان",rep_enroll:"پروگرام کے لحاظ سے داخلے",rep_count:"طلبہ",rep_nor:"اس مدت کا کوئی ڈیٹا نہیں",rep_stu:"طالب علم",rep_prog:"پروگرام",rep_due:"بقایا (روپے)",rep_from:"از",rep_to:"تا",
 bak_title:"بیک اپ",bak_exp:"بیک اپ فائل ڈاؤن لوڈ کریں",bak_exp_d:"تمام ڈیٹا فائل میں محفوظ کریں۔ اسے USB میں کاپی کر کے محفوظ رکھیں۔",bak_imp:"فائل سے بحال کریں",bak_imp_d:"موجودہ تمام ڈیٹا بیک اپ فائل سے بدل جائے گا۔",bak_confirm:"اس سے موجودہ تمام ڈیٹا فائل سے بدل جائے گا۔ جاری رکھیں؟",bak_done:"بیک اپ ڈاؤن لوڈ ہو گیا۔",bak_restored:"ڈیٹا کامیابی سے بحال ہو گیا۔",bak_drive:"گوگل ڈرائیو بیک اپ",bak_drive_d:"ادارے کی گوگل ڈرائیو پر خودکار خفیہ شدہ بیک اپ (انٹرنیٹ + ایک بار سائن اِن درکار)۔",bak_connect:"گوگل ڈرائیو جوڑیں",bak_now:"ابھی ڈرائیو پر بیک اپ کریں",bak_ok:"ڈرائیو پر کامیابی سے اپ لوڈ ہو گیا۔",bak_need:"پہلے ترتیبات میں گوگل کلائنٹ آئی ڈی درج کریں۔",bak_offline:"انٹرنیٹ نہیں — کنیکٹ کر کے دوبارہ کوشش کریں۔",bak_enc:"بیک اپ اپ لوڈ سے پہلے خفیہ کیا جاتا ہے۔ اسے صرف یہ ادارہ پڑھ سکتا ہے۔",
@@ -376,7 +376,7 @@ async function vDash(){
   for(var j=0;j<challans.length;j++) dues += (Number(challans[j].amount)||0)-(Number(challans[j].paid)||0);
   payments.sort(function(a,b){ return b.date<a.date?-1:1; });
   var recent = payments.slice(0,8).map(function(p){
-    return '<tr><td dir="ltr">'+esc(p.date)+'</td><td>'+esc(p.recNo)+'</td><td>'+esc(stuName(p.cnic))+'</td><td style="text-align:right">'+fmt(p.amount)+'</td><td>'+esc(methodName(p.method))+'</td></tr>';
+    return '<tr><td dir="ltr">'+esc(p.date)+'</td><td>'+esc(p.recNo)+'</td><td>'+stuLink(p.cnic, stuName(p.cnic))+'</td><td style="text-align:right">'+fmt(p.amount)+'</td><td>'+esc(methodName(p.method))+'</td></tr>';
   }).join('');
   var demoBanner = students.length===0
     ? '<div class="card" style="border:2px dashed var(--g)"><h2>'+t('demo_load')+'</h2><p class="mut">'+t('demo_note')+'</p><p class="mt"><button class="btn gold" onclick="loadDemoData()">'+t('demo_load')+'</button></p></div>' : '';
@@ -415,6 +415,37 @@ var FHEADS = ['admission','tuition','exam','reg','idcard','book','other','fine',
 function headName(k){ return t('fh_'+k)||k; }
 function headOpts(sel){ return FHEADS.map(function(k){ return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+headName(k)+'</option>'; }).join(''); }
 
+function crumbs(items){
+  // items: [[label, href|null]]
+  return '<div class="crumbs">'+items.map(function(x,i){
+    return (i?' &rsaquo; ':'')+(x[1]?'<a href="'+x[1]+'">'+esc(x[0])+'</a>':esc(x[0]));
+  }).join('')+'</div>';
+}
+function stuLink(cnic, name){ return '<a href="#/student/'+esc(cnic)+'">'+esc(name)+'</a>'; }
+function photoHTML(s, cls){
+  if(s && s.photo) return '<img class="'+(cls||'ph')+'" src="'+s.photo+'">';
+  var ini = s&&s.name ? esc(s.name.trim().charAt(0).toUpperCase()) : '?';
+  return '<span class="'+(cls==='ph-sm'?'ph-ph ph-sm':'ph-ph')+'"'+(cls==='ph-sm'?' style="width:34px;height:34px;font-size:14px;margin-right:8px"':'')+'>'+ini+'</span>';
+}
+var _photoData = '';
+function photoPick(inp){
+  var f = inp.files && inp.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var mx = 480, w = img.width, ht = img.height;
+      if(w>mx||ht>mx){ var r = Math.min(mx/w, mx/ht); w=Math.round(w*r); ht=Math.round(ht*r); }
+      var cv = document.createElement('canvas'); cv.width=w; cv.height=ht;
+      cv.getContext('2d').drawImage(img,0,0,w,ht);
+      _photoData = cv.toDataURL('image/jpeg',0.75);
+      document.getElementById('phPrev').innerHTML = '<img class="ph" src="'+_photoData+'">';
+    };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+}
+function photoClear(){ _photoData=''; document.getElementById('phPrev').innerHTML=''; var i=document.getElementById('f_photo'); if(i) i.value=''; }
 /* ---------- students ---------- */
 async function vStudents(q){
   await warmStuCache();
@@ -425,7 +456,7 @@ async function vStudents(q){
     var s=students[i];
     if(q && (s.name+' '+s.cnic+' '+(s.phone||'')).toLowerCase().indexOf(q)<0) continue;
     var d = await duesOf(s.cnic);
-    rows += '<tr><td>'+esc(s.roll||'-')+'</td><td><a href="#/student/'+esc(s.cnic)+'">'+esc(s.name)+'</a></td><td dir="ltr">'+esc(s.cnic)+'</td><td dir="ltr">'+esc(s.phone||'-')+'</td><td>'+esc(progName(s.program))+'</td>'
+    rows += '<tr><td>'+esc(s.roll||'-')+'</td><td>'+photoHTML(s,'ph-sm')+'<a href="#/student/'+esc(s.cnic)+'">'+esc(s.name)+'</a></td><td dir="ltr">'+esc(s.cnic)+'</td><td dir="ltr">'+esc(s.phone||'-')+'</td><td>'+esc(progName(s.program))+'</td>'
     +'<td style="text-align:right;color:'+(d>0?'var(--red)':'var(--g)')+';font-weight:700">'+fmt(d)+'</td>'
     +'<td><a class="btn sm gh" href="#/studentform/'+esc(s.cnic)+'">'+t('s_edit')+'</a> <button class="btn sm red" onclick="delStudent(\''+esc(s.cnic)+'\')">'+t('s_del')+'</button></td></tr>';
   }
@@ -433,7 +464,7 @@ async function vStudents(q){
     return '<tr><td>'+esc(x.name)+'</td><td>'+(x.type==='spring'?t('ses_spring'):t('ses_fall'))+'</td><td>'+x.year+'</td><td>'+(x.active?t('ses_active'):t('ses_inactive'))+'</td>'
     +'<td><button class="btn sm gh" onclick="toggleSes('+x.id+')">'+(x.active?t('ses_inactive'):t('ses_active'))+'</button></td></tr>';
   }).join('');
-  return '<div class="card"><h2>'+t('ses_title')+'</h2><div class="f2"><div class="frow"><label>'+t('ses_name')+'</label><input id="ses_name" placeholder="Spring 2026" dir="ltr"></div>'
+  return '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('s_title'),null]])+'<h2>'+t('ses_title')+'</h2><div class="f2"><div class="frow"><label>'+t('ses_name')+'</label><input id="ses_name" placeholder="Spring 2026" dir="ltr"></div>'
   +'<div class="frow"><label>'+t('ses_type')+'</label><select id="ses_type"><option value="spring">'+t('ses_spring')+'</option><option value="fall">'+t('ses_fall')+'</option></select></div></div>'
   +'<div class="f2"><div class="frow"><label>'+t('ses_year')+'</label><input id="ses_year" inputmode="numeric" value="'+new Date().getFullYear()+'"></div>'
   +'<div class="frow"><label>&nbsp;</label><button class="btn" onclick="addSession()">'+t('ses_add')+'</button></div></div>'
@@ -471,7 +502,10 @@ async function vStudentForm(cnic){
   function fn(id,lb,v){ return '<div class="frow"><label>'+lb+'</label><input id="'+id+'" value="'+esc(v==null?'':v)+'" inputmode="decimal"></div>'; }
   var fee = s.fee||{};
   var g = '<div class="frow"><label>'+t('f_gender')+' <span class="req">*</span></label><select id="f_gender"><option value="M"'+(s.gender==='M'?' selected':'')+'>'+t('f_male')+'</option><option value="F"'+(s.gender==='F'?' selected':'')+'>'+t('f_female')+'</option></select></div>';
-  var html = '<div class="card"><h2>'+(isNew?t('s_add'):t('s_edit')+' — '+esc(s.name))+'</h2><div class="err" id="stErr"></div>'
+  _photoData = s.photo||'';
+  var html = '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_stu'),'#/students'],[isNew?t('s_add'):s.name,null]])
+  +'<h2>'+(isNew?t('s_add'):t('s_edit')+' — '+esc(s.name))+'</h2><div class="err" id="stErr"></div>'
+  +'<div class="frow"><label>'+t('p_photo')+'</label><div class="row" style="align-items:center"><span id="phPrev">'+photoHTML(s)+'</span><input type="file" id="f_photo" accept="image/*" onchange="photoPick(this)" style="max-width:220px"><button type="button" class="btn sm gh" onclick="photoClear()">'+t('cmn_del')+'</button></div></div>'
   +'<div class="f2">'+f('f_name',t('f_name'),s.name,1)+f('f_father',t('f_father'),s.father,1)+'</div>'
   +'<div class="f2">'+g+f('f_dob',t('f_dob'),s.dob,1,'type="date"')+'</div>'
   +'<div class="f2">'+f('f_cnic',t('f_cnic'),s.cnic,1,'inputmode="numeric"','35202-1234567-1')+f('f_phone',t('f_phone'),s.phone,1,'inputmode="tel"')+'</div>'
@@ -508,7 +542,8 @@ async function saveStudent(isNew, oldCnic){
     session:val('f_session'), roll:val('f_roll'), csys:val('f_csys'),
     sno:val('f_sno'), domicile:val('f_domicile'), ssc:val('f_ssc'), hssc:val('f_hssc'), shift:val('f_shift'),
     examReg:val('f_examreg'), duration:val('f_duration'), remarks:val('f_remarks'),
-    fee:{adm:num('f_fadm'),monthly:num('f_fmon'),reg:num('f_freg'),exam:num('f_fexam'),fine:num('f_ffine'),other:num('f_fother')} };
+    fee:{adm:num('f_fadm'),monthly:num('f_fmon'),reg:num('f_freg'),exam:num('f_fexam'),fine:num('f_ffine'),other:num('f_fother')},
+    photo:_photoData||'' };
   var bad = d.name.length<3 || d.father.length<3 || (d.gender!=='M'&&d.gender!=='F') || !/^\d{4}-\d{2}-\d{2}$/.test(d.dob)
     || d.cnic.length!==13 || !(d.phone.length===11&&d.phone.indexOf('03')===0) || (d.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
     || d.district.length<2 || d.addr.length<10 || !d.qual || !d.board || !(parseFloat(d.marks)>=0&&parseFloat(d.marks)<=100)
@@ -551,9 +586,11 @@ async function vStudentProfile(cnic){
   }
   function kv(lb,v){ return '<tr><td style="width:40%;color:var(--mut)">'+lb+'</td><td style="font-weight:600">'+(v==null||v==='' ? '-' : esc(String(v)))+'</td></tr>'; }
   var gName = s.gender==='M'?t('f_male'):t('f_female');
-  var html = '<div class="card"><div class="between"><div><h2 style="margin:0">'+esc(s.name)+'</h2><div class="mut">'+t('f_roll')+': '+esc(s.roll||'-')+' &middot; '+esc(progName(s.program))+' &middot; '+(s.session||'')+'</div></div>'
+  var html = '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_stu'),'#/students'],[s.name,null]])
+  +'<div class="between"><div style="display:flex;gap:14px;align-items:center">'+photoHTML(s)+'<div><h2 style="margin:0">'+esc(s.name)+'</h2><div class="mut">'+t('f_roll')+': '+esc(s.roll||'-')+' &middot; '+esc(progName(s.program))+' &middot; '+(s.session||'')+'</div></div>'
     +'<div class="row"><a class="btn sm" href="#/studentform/'+esc(s.cnic)+'">'+t('p_edit')+'</a><a class="btn sm gold" href="#/collect">'+t('p_collect')+'</a><a class="btn sm red" href="#/fees/fine/'+esc(s.cnic)+'">'+t('fee_add_fine')+'</a><button class="btn sm gh" onclick="window.print()">'+t('p_print')+'</button></div></div>'
-    +'<div class="mt"><span class="badge b-'+s.status+'">'+t('f_'+s.status)+'</span></div></div>'
+    +'<div class="mt"><span class="badge b-'+s.status+'">'+t('f_'+s.status)+'</span></div></div></div>'
+  +'<div class="row mt" style="gap:6px"><a class="btn sm gh" href="#/attendance/stu">'+t('nav_at')+'</a><a class="btn sm gh" href="#/academics">'+t('nav_acad')+'</a><a class="btn sm gh" href="#/letters/new">'+t('nav_let')+'</a><a class="btn sm gh" href="#/fees">'+t('nav_fee')+'</a></div></div>'
   +'<div class="card"><h2>'+t('p_personal')+'</h2><table class="tbl">'
     +kv(t('f_name'),s.name)+kv(t('f_father'),s.father)+kv(t('f_phone'),s.phone)+kv(t('f_cnic'),s.cnic)
     +kv(t('p_sno'),s.sno)+kv(t('f_dob'),s.dob)+kv(t('p_ssc'),s.ssc)+kv(t('p_domicile'),s.domicile||s.district)
@@ -656,7 +693,8 @@ async function vChallanForm(cnic){
   var stuOpts = '<option value="">'+t('fee_select_stu')+'</option>'+students.map(function(s){ return '<option value="'+s.cnic+'"'+(s.cnic===cnic?' selected':'')+'>'+esc(s.name)+' ('+esc(s.cnic)+')</option>'; }).join('');
   var headOpts = '<option value="">'+t('fee_select_head')+'</option>'+heads.map(function(hh){ return '<option value="'+hh.id+'">'+esc(progName(hh.program))+' — '+esc(hh.title)+' ('+fmt(hh.amount)+')</option>'; }).join('');
   var d = new Date(); d.setDate(d.getDate()+10);
-  return '<div class="card"><h2>'+t('fee_new')+'</h2><div class="err" id="chErr"></div>'
+  var _crumb = crumbs([[t('nav_dash'),'#/dash'],[t('nav_fee'),'#/fees'],[t('fee_new'),null]]);
+  return '<div class="card">'+_crumb+'<h2>'+t('fee_new')+'</h2><div class="err" id="chErr"></div>'
   +'<div class="frow"><label>'+t('fee_student')+' <span class="req">*</span></label><select id="ch_stu">'+stuOpts+'</select></div>'
   +'<div class="frow"><label>'+t('fee_head')+' <span class="req">*</span></label><select id="ch_head">'+headOpts+'</select></div>'
   +'<div class="frow"><label>'+t('fee_due')+'</label><input type="date" id="ch_due" value="'+d.toISOString().slice(0,10)+'"></div>'
@@ -717,8 +755,8 @@ async function vPayForm(chId){
   var c = await DB.get('challans',chId);
   if(!c) return '<div class="card">'+t('fee_nor')+'</div>';
   var bal = Number(c.amount)-Number(c.paid);
-  return '<div class="card"><h2>'+t('fee_pay')+'</h2><div class="err" id="payErr"></div>'
-  +'<p class="mut">'+t('fee_no')+': <b>'+esc(c.no)+'</b> · '+esc(stuName(c.cnic))+' · '+esc(c.title)+'<br>'+t('fee_total_due')+': <b style="color:var(--red)">'+t('cmn_rs')+' '+fmt(bal)+'</b></p>'
+  return '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_fee'),'#/fees'],[t('fee_pay'),null]])+'<h2>'+t('fee_pay')+'</h2><div class="err" id="payErr"></div>'
+  +'<p class="mut">'+t('fee_no')+': <b>'+esc(c.no)+'</b> · '+stuLink(c.cnic, stuName(c.cnic))+' · '+esc(c.title)+'<br>'+t('fee_total_due')+': <b style="color:var(--red)">'+t('cmn_rs')+' '+fmt(bal)+'</b></p>'
   +'<div class="f2 mt"><div class="frow"><label>'+t('fee_pamt')+' <span class="req">*</span></label><input id="pay_amt" inputmode="numeric" value="'+bal+'"></div>'
   +'<div class="frow"><label>'+t('fee_date')+'</label><input type="date" id="pay_date" value="'+today()+'"></div></div>'
   +'<div class="f2"><div class="frow"><label>'+t('fee_method')+'</label><select id="pay_method"><option value="cash">'+t('fee_cash')+'</option><option value="bank">'+t('fee_bank')+'</option><option value="jazz">'+t('fee_jazz')+'</option><option value="easy">'+t('fee_easy')+'</option></select></div>'
@@ -1010,7 +1048,8 @@ async function vAttendance(sub){
   for(var i=0;i<all.length;i++) if(all[i].kind===kind) _attBuf[all[i].ref]=all[i].status;
   var rows = list.filter(function(x){ if(kind==='emp') return true; if(x.status!=='active') return false; if(_attSes && String(x.session)!==String(_attSes)) return false; return true; }).map(function(x){
     var st = _attBuf[x.cnic]||'P';
-    return '<tr><td>'+esc(x.name)+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><div class="row" style="gap:4px">'
+    var nmCell = kind==='stu' ? stuLink(x.cnic, x.name) : esc(x.name);
+    return '<tr><td>'+nmCell+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><div class="row" style="gap:4px">'
     +['P','A','L'].map(function(s2){ return '<button class="btn sm '+(st===s2?'':'gh')+'" id="ab_'+x.cnic+'" onclick="attSet(\''+x.cnic+'\',\''+s2+'\')">'+t('at_'+s2.toLowerCase())+'</button>'; }).join('')
     +'</div></td></tr>';
   }).join('');
@@ -1049,7 +1088,8 @@ async function attSummary(kind){
   var rows = Object.keys(agg).map(function(ref){
     var nm = kind==='stu' ? stuName(ref) : (names[ref]||ref);
     var g=agg[ref], tot=g.P+g.A+g.L;
-    return '<tr><td>'+esc(nm)+'</td><td dir="ltr">'+esc(ref)+'</td><td style="text-align:center">'+g.P+'</td><td style="text-align:center">'+g.A+'</td><td style="text-align:center">'+g.L+'</td><td style="text-align:center">'+tot+'</td></tr>';
+    var nmCell2 = kind==='stu' ? stuLink(ref, nm) : esc(nm);
+    return '<tr><td>'+nmCell2+'</td><td dir="ltr">'+esc(ref)+'</td><td style="text-align:center">'+g.P+'</td><td style="text-align:center">'+g.A+'</td><td style="text-align:center">'+g.L+'</td><td style="text-align:center">'+tot+'</td></tr>';
   }).join('');
   document.getElementById('attSum').innerHTML = '<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th style="text-align:center">'+t('at_p')+'</th><th style="text-align:center">'+t('at_a')+'</th><th style="text-align:center">'+t('at_l')+'</th><th style="text-align:center">'+t('at_total')+'</th></tr>'+(rows||'<tr><td colspan="6" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>';
 }
@@ -1279,7 +1319,7 @@ async function loadDemoData(){
 /* ---------- quick collect ---------- */
 var _qcStu = null;
 async function vCollect(){
-  return '<div class="card"><h2>'+t('qc_title')+'</h2>'
+  return '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_fee'),'#/fees'],[t('qc_title'),null]])+'<h2>'+t('qc_title')+'</h2>'
   +'<div class="frow"><label>'+t('qc_search')+'</label><input id="qc_q" autofocus oninput="qcSearch()" placeholder="'+t('qc_search_ph')+'"></div>'
   +'<div id="qcResults" class="mt"></div><div id="qcDues"></div></div>';
 }
@@ -1306,7 +1346,7 @@ async function qcPick(cnic){
     var b = Number(c.amount)-Number(c.paid); tot+=b;
     return '<tr><td><input type="checkbox" class="qc_chk" value="'+c.id+'" checked style="width:20px;height:20px"></td><td>'+esc(c.no)+'</td><td>'+esc(c.title)+'</td><td dir="ltr">'+esc(c.due)+'</td><td style="text-align:right">'+fmt(b)+'</td></tr>';
   }).join('');
-  document.getElementById('qcDues').innerHTML = '<h3 class="mt">'+esc(s.name)+' — '+t('fee_dues')+': '+t('cmn_rs')+' '+fmt(tot)+'</h3>'
+  document.getElementById('qcDues').innerHTML = '<h3 class="mt">'+stuLink(s.cnic,s.name)+' — '+t('fee_dues')+': '+t('cmn_rs')+' '+fmt(tot)+'</h3>'
   +(dues.length? '<div style="overflow-x:auto"><table class="tbl"><tr><th></th><th>'+t('fee_no')+'</th><th>'+t('fee_head')+'</th><th>'+t('fee_due')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th></tr>'+rows+'</table></div>'
   +'<div class="f2 mt"><div class="frow"><label>'+t('fee_method')+'</label><select id="qc_method"><option value="cash">'+t('fee_cash')+'</option><option value="bank">'+t('fee_bank')+'</option><option value="jazz">'+t('fee_jazz')+'</option><option value="easy">'+t('fee_easy')+'</option></select></div>'
   +'<div class="frow"><label>'+t('fee_type')+'</label><select id="qc_head">'+headOpts('tuition')+'</select></div></div>'
@@ -1492,9 +1532,9 @@ async function vExamDetail(id){
   var es = await DB.byIndex('examstu','byExam',id);
   await warmStuCache();
   var rows = es.map(function(x){
-    return '<tr><td>'+esc(x.roll)+'</td><td>'+esc(stuName(x.cnic))+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><button class="btn sm red" onclick="delExamStu('+x.id+','+id+')">×</button></td></tr>';
+    return '<tr><td>'+esc(x.roll)+'</td><td>'+stuLink(x.cnic, stuName(x.cnic))+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><button class="btn sm red" onclick="delExamStu('+x.id+','+id+')">×</button></td></tr>';
   }).join('');
-  return '<div class="card"><h2>'+esc(e.name)+'</h2><p class="mut">'+esc(progName(e.program))+' — '+esc(e.sem)+' — <span dir="ltr">'+esc(e.date||'')+'</span></p>'
+  return '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_acad'),'#/academics'],[e.name,null]])+'<h2>'+esc(e.name)+'</h2><p class="mut">'+esc(progName(e.program))+' — '+esc(e.sem)+' — <span dir="ltr">'+esc(e.date||'')+'</span></p>'
   +'<div class="row"><button class="btn" onclick="examAddStudents('+id+')">'+t('ac_selstu')+'</button> '
   +'<button class="btn gh" onclick="printRollSlips('+id+')">'+t('ac_rollslips')+'</button> '
   +'<a class="btn gh" href="#/academics/marks/'+id+'">'+t('ac_marksentry')+'</a> '
@@ -1592,14 +1632,14 @@ async function vResult(examId){
   });
   res.sort(function(a,b){return b.tot-a.tot;});
   var rows = res.map(function(r,i){
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.roll)+'</td><td>'+esc(stuName(r.cnic))+'</td><td style="text-align:right">'+r.tot+' / '+totalMax+'</td><td style="text-align:right">'+r.pct+'%</td></tr>';
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.roll)+'</td><td>'+stuLink(r.cnic, stuName(r.cnic))+'</td><td style="text-align:right">'+r.tot+' / '+totalMax+'</td><td style="text-align:right">'+r.pct+'%</td></tr>';
   }).join('');
   var dmcRows = res.map(function(r,i){
     var cells = r.per.map(function(v){return '<td style="text-align:right">'+v+'</td>';}).join('');
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(stuName(r.cnic))+'</td><td dir="ltr">'+esc(r.cnic)+'</td>'+cells+'<td style="text-align:right"><b>'+r.tot+'</b></td><td style="text-align:right">'+r.pct+'%</td></tr>';
+    return '<tr><td>'+(i+1)+'</td><td>'+stuLink(r.cnic, stuName(r.cnic))+'</td><td dir="ltr">'+esc(r.cnic)+'</td>'+cells+'<td style="text-align:right"><b>'+r.tot+'</b></td><td style="text-align:right">'+r.pct+'%</td></tr>';
   }).join('');
   var subHeads = e.subjects.map(function(s){return '<th style="text-align:right">'+esc(subName(s.sid))+'<br><small>'+s.marks+'</small></th>';}).join('');
-  return '<div class="card"><h2>'+esc(e.name)+' — '+t('ac_result')+'</h2>'
+  return '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_acad'),'#/academics'],[e.name,'#/academics/exam/'+examId],[t('ac_result'),null]])+'<h2>'+esc(e.name)+' — '+t('ac_result')+'</h2>'
   +'<p><button class="btn gh" onclick="printDMC('+examId+')">'+t('ac_printdmc')+'</button></p>'
   +'<h3 class="mt">'+t('ac_positions')+'</h3><div style="overflow-x:auto"><table class="tbl"><tr><th>#</th><th>'+t('s_roll')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('ac_total')+'</th><th style="text-align:right">%</th></tr>'+rows+'</table></div>'
   +'<h3 class="mt">'+t('ac_dmc')+'</h3><div style="overflow-x:auto"><table class="tbl"><tr><th>#</th><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th>'+subHeads+'<th style="text-align:right">'+t('ac_total')+'</th><th style="text-align:right">%</th></tr>'+dmcRows+'</table></div></div>';
@@ -1694,7 +1734,7 @@ async function vLetterLog(){
   var all = await DB.all('letters');
   all.sort(function(a,b){ return b.date<a.date?-1:1; });
   var rows = all.slice(0,100).map(function(l){
-    return '<tr><td>'+esc(l.no)+'</td><td>'+esc(t('lt_'+l.type)||l.type)+'</td><td>'+esc(l.name||l.cnic||'')+'</td><td dir="ltr">'+esc(l.date)+'</td><td><button class="btn sm gh" onclick="printLetter('+l.id+')">'+t('cmn_print')+'</button></td></tr>';
+    return '<tr><td>'+esc(l.no)+'</td><td>'+esc(t('lt_'+l.type)||l.type)+'</td><td>'+(l.cnic?stuLink(l.cnic,l.name||l.cnic):esc(l.name||''))+'</td><td dir="ltr">'+esc(l.date)+'</td><td><button class="btn sm gh" onclick="printLetter('+l.id+')">'+t('cmn_print')+'</button></td></tr>';
   }).join('');
   return '<div class="card"><h2>'+t('lt_log')+'</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('lt_no')+'</th><th>'+t('lt_type')+'</th><th>'+t('s_name')+'</th><th>'+t('fee_date')+'</th><th></th></tr>'+(rows||'<tr><td colspan="5" class="mut">'+t('cmn_none')+'</td></tr>')+'</table></div></div>';
 }
@@ -1899,7 +1939,7 @@ async function vReg(){
   var all = await DB.all('students');
   await warmStuCache();
   var rows = all.filter(function(s){return s.status==='active';}).map(function(s){
-    return '<tr><td>'+esc(s.name)+'</td><td>'+esc(s.father)+'</td><td dir="ltr">'+esc(s.cnic)+'</td><td>'+esc(progName(s.program))+'</td><td>'+esc(s.roll||'')+'</td><td><button class="btn sm gh" onclick="printRegLetter(\''+s.cnic+'\')">'+t('cmn_print')+'</button></td></tr>';
+    return '<tr><td>'+(s?stuLink(s.cnic,s.name):esc(''))+'</td><td>'+esc(s?s.father:'')+'</td><td dir="ltr">'+esc(s?s.cnic:'')+'</td><td>'+esc(progName(s.program))+'</td><td>'+esc(s.roll||'')+'</td><td><button class="btn sm gh" onclick="printRegLetter(\''+s.cnic+'\')">'+t('cmn_print')+'</button></td></tr>';
   }).join('');
   return '<div class="card"><h2>'+t('of_reg')+'</h2><p class="mut">'+t('of_regd')+'</p>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_father')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_prog')+'</th><th>'+t('s_roll')+'</th><th></th></tr>'+(rows||'<tr><td colspan="6" class="mut">'+t('cmn_none')+'</td></tr>')+'</table></div></div>';
