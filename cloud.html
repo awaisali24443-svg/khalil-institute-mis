@@ -1772,9 +1772,27 @@ async function attSave(kind){
   var d = val('att_date')||today();
   var old = await DB.byIndex('attendance','byDate',d);
   for(var i=0;i<old.length;i++) if(old[i].kind===kind) await DB.del('attendance',old[i].id);
-  var n=0;
-  for(var ref in _attBuf){ await DB.put('attendance',{date:d,kind:kind,ref:ref,status:_attBuf[ref]}); n++; }
-  toast(t('at_saved')+': '+n);
+  var n=0, absentCount=0;
+  var stuMap = {};
+  if(kind==='stu'){
+    var allStu = await DB.all('students');
+    for(var si=0;si<allStu.length;si++) stuMap[allStu[si].cnic] = allStu[si];
+  }
+  for(var ref in _attBuf){
+    await DB.put('attendance',{date:d,kind:kind,ref:ref,status:_attBuf[ref]}); n++;
+    // queue absence SMS for absent students
+    if(kind==='stu' && _attBuf[ref]==='A'){
+      var st = stuMap[ref];
+      if(st && st.phone){
+        var L = LANG==='ur'?'ur':'en';
+        var tmpl = _smsTemplates.absent[L]||_smsTemplates.absent.en;
+        var msg = tmpl.replace('{name}',st.name||'').replace('{date}',d);
+        await DB.put('sms',{to:st.phone, message:msg, status:'pending', created_at:new Date().toISOString(), by:'auto', template:'absent'});
+        absentCount++;
+      }
+    }
+  }
+  toast(t('at_saved')+': '+n+(absentCount?' ('+absentCount+' SMS)':''));
   _attBuf={};
 }
 async function attSummary(kind){
