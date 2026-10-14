@@ -67,6 +67,10 @@ kbd{background:#eef3f0;border:1px solid var(--line);border-bottom-width:2px;bord
 .tbl tr:hover td{background:#f6faf7}
 .tabs a{transition:background .15s}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--g);outline-offset:-1px;border-color:var(--g)}
+#kinWrap{animation:fadeIn .18s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+nav.tabs a{position:relative}
+nav.tabs a.on::after{content:'';position:absolute;left:12px;right:12px;bottom:-1px;height:3px;background:var(--gold);border-radius:2px}
 #printArea{display:none}
 @media print{
  body>*{display:none!important}
@@ -461,7 +465,10 @@ async function render(){
     try{
       var html = await viewHtml;
       clearTimeout(slowT);
-      if(document.getElementById('kinWrap')===wrap) wrap.innerHTML = html;
+      if(document.getElementById('kinWrap')===wrap){
+        wrap.innerHTML = html;
+        wrap.style.animation = 'none'; void wrap.offsetWidth; wrap.style.animation = '';
+      }
     }catch(e){
       clearTimeout(slowT);
       wrap.innerHTML = '<div class="card"><div class="err" style="display:block">Error: '+esc(e.message||e)+'</div></div>';
