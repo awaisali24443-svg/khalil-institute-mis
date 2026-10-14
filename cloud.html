@@ -383,16 +383,44 @@ function shell(inner, active){
 }
 async function doLogout(){
   try{ await fetch(SB.url+'/auth/v1/logout', {method:'POST', headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||SB.anon)}}); }catch(e){}
-  _curUser=null; SB.token=null; DB.clearCache(); _kbHelp=false;
+  _curUser=null; SB.token=null; DB.clearCache(); _kbHelp=false; _shellBuilt=false;
   sessionStorage.removeItem('kin_token'); sessionStorage.removeItem('kin_refresh'); sessionStorage.removeItem('kin_uid'); sessionStorage.removeItem('kin_email');
   location.hash='#/login';
 }
 function go(r){ location.hash = '#/'+r; }
 
+var _shellBuilt = false;
+function ensureShell(active){
+  var app = document.getElementById('app');
+  if(!_shellBuilt || !document.getElementById('kinWrap')){
+    app.innerHTML = shell('<div id="kinWrap"></div>', active);
+    _shellBuilt = true;
+    bindPrefetch();
+  } else {
+    var tabs = app.querySelectorAll('nav.tabs a');
+    for(var i=0;i<tabs.length;i++) tabs[i].className = (tabs[i].getAttribute('href')==='#/'+active) ? 'on' : '';
+  }
+  return document.getElementById('kinWrap');
+}
+// prefetch tab data on hover for instant switching
+var _prefetchMap = {dash:['students','payments','challans'],students:['students'],fees:['feeHeads','challans'],
+  hr:['employees'],attendance:['attendance'],accounts:['expenses','payments'],reports:['payments','students'],
+  academics:['subjects','exams'],library:['books'],stock:['stock_items'],office:['visitors']};
+function bindPrefetch(){
+  var tabs = document.querySelectorAll('nav.tabs a');
+  for(var i=0;i<tabs.length;i++){
+    (function(a){
+      var mod = a.getAttribute('href').replace('#/','');
+      a.addEventListener('mouseover', function(){
+        var tables = _prefetchMap[mod]||[];
+        for(var j=0;j<tables.length;j++) DB.all(tables[j]).catch(function(){});
+      });
+    })(tabs[i]);
+  }
+}
 async function render(){
   var app = document.getElementById('app');
   var h = location.hash || '#/dash';
-  if(h !== '#/login') app.innerHTML = '<div class="wrap"><div class="card"><p class="mut">Loading…</p></div></div>';
   var u = await curUser();
   if(!u && h!=='#/login'){ location.hash='#/login'; return; }
   if(h==='#/login'){ if(u){ location.hash='#/'+((u.rights||[])[0]||'dash'); return; } app.innerHTML = vLogin(); return; }
@@ -403,31 +431,45 @@ async function render(){
   if(!allowed && u.role==='student' && r[0]==='student' && r[1]===u.cnic) allowed = true;
   if(!allowed){ location.hash = '#/'+((u.rights||[])[0]||'dash'); return; }
   try{
-    if(r[0]==='dash') app.innerHTML = shell(await vDash(),'dash');
-    else if(r[0]==='students') app.innerHTML = shell(await vStudents(r[1]||''),'students');
-    else if(r[0]==='student') app.innerHTML = shell(r[1]==='new'?await vStudentForm('new'):await vStudentProfile(r[1]||''),'students');
-    else if(r[0]==='studentform') app.innerHTML = shell(await vStudentForm(r[1]||'new'),'students');
-    else if(r[0]==='fees') app.innerHTML = shell(await vFees(r.slice(1).join('/')),'fees');
-    else if(r[0]==='hr') app.innerHTML = shell(await vHR(),'hr');
-    else if(r[0]==='attendance') app.innerHTML = shell(await vAttendance(r[1]||''),'attendance');
-    else if(r[0]==='accounts') app.innerHTML = shell(await vAccounts(r[1]||''),'accounts');
-    else if(r[0]==='collect') app.innerHTML = shell(await vCollect(),'fees');
+    var viewHtml, viewMod;
+    if(r[0]==='dash'){ viewHtml = vDash(); viewMod='dash'; }
+    else if(r[0]==='students'){ viewHtml = vStudents(r[1]||''); viewMod='students'; }
+    else if(r[0]==='student'){ viewHtml = r[1]==='new'?await vStudentForm('new'):await vStudentProfile(r[1]||''); viewMod='students'; }
+    else if(r[0]==='studentform'){ viewHtml = vStudentForm(r[1]||'new'); viewMod='students'; }
+    else if(r[0]==='fees'){ viewHtml = vFees(r.slice(1).join('/')); viewMod='fees'; }
+    else if(r[0]==='hr'){ viewHtml = vHR(); viewMod='hr'; }
+    else if(r[0]==='attendance'){ viewHtml = vAttendance(r[1]||''); viewMod='attendance'; }
+    else if(r[0]==='accounts'){ viewHtml = vAccounts(r[1]||''); viewMod='accounts'; }
+    else if(r[0]==='collect'){ viewHtml = vCollect(); viewMod='fees'; }
     else if(r[0]==='academics'){
-      if(r[1]==='exam') app.innerHTML = shell(await vExamDetail(Number(r[2])),'academics');
-      else if(r[1]==='marks') app.innerHTML = shell(await vMarksEntry(Number(r[2])),'academics');
-      else if(r[1]==='result') app.innerHTML = shell(await vResult(Number(r[2])),'academics');
-      else app.innerHTML = shell(await vAcademics(r[1]||'subjects'),'academics');
+      if(r[1]==='exam'){ viewHtml = vExamDetail(Number(r[2])); viewMod='academics'; }
+      else if(r[1]==='marks'){ viewHtml = vMarksEntry(Number(r[2])); viewMod='academics'; }
+      else if(r[1]==='result'){ viewHtml = vResult(Number(r[2])); viewMod='academics'; }
+      else { viewHtml = vAcademics(r[1]||'subjects'); viewMod='academics'; }
     }
-    else if(r[0]==='letters') app.innerHTML = shell(await vLetters(r[1]||'new'),'letters');
-    else if(r[0]==='library') app.innerHTML = shell(await vLibrary(r[1]||'books'),'library');
-    else if(r[0]==='stock') app.innerHTML = shell(await vStock(r[1]||'items'),'stock');
-    else if(r[0]==='office') app.innerHTML = shell(await vOffice(r[1]||'hospital'),'office');
-    else if(r[0]==='reports') app.innerHTML = shell(await vReports(),'reports');
-    else if(r[0]==='audit') app.innerHTML = shell(await vAudit(),'audit');
-    else if(r[0]==='backup') app.innerHTML = shell(vBackup(),'backup');
-    else if(r[0]==='settings') app.innerHTML = shell(await vSettings(),'settings');
-    else app.innerHTML = shell(await vDash(),'dash');
-  }catch(err){ app.innerHTML = shell('<div class="card"><div class="err" style="display:block">Error: '+esc(err.message||err)+'</div></div>','dash'); }
+    else if(r[0]==='letters'){ viewHtml = vLetters(r[1]||'new'); viewMod='letters'; }
+    else if(r[0]==='library'){ viewHtml = vLibrary(r[1]||'books'); viewMod='library'; }
+    else if(r[0]==='stock'){ viewHtml = vStock(r[1]||'items'); viewMod='stock'; }
+    else if(r[0]==='office'){ viewHtml = vOffice(r[1]||'hospital'); viewMod='office'; }
+    else if(r[0]==='reports'){ viewHtml = vReports(); viewMod='reports'; }
+    else if(r[0]==='backup'){ viewHtml = Promise.resolve(vBackup()); viewMod='backup'; }
+    else if(r[0]==='settings'){ viewHtml = vSettings(); viewMod='settings'; }
+    else { viewHtml = vDash(); viewMod='dash'; }
+    // instant shell first, then content (no loading flash for fast renders)
+    var wrap = ensureShell(viewMod);
+    var slowT = setTimeout(function(){ wrap.innerHTML = '<div class="card"><p class="mut">Loading…</p></div>'; }, 500);
+    try{
+      var html = await viewHtml;
+      clearTimeout(slowT);
+      if(document.getElementById('kinWrap')===wrap) wrap.innerHTML = html;
+    }catch(e){
+      clearTimeout(slowT);
+      wrap.innerHTML = '<div class="card"><div class="err" style="display:block">Error: '+esc(e.message||e)+'</div></div>';
+    }
+  }catch(err){
+    var w2 = ensureShell('dash');
+    w2.innerHTML = '<div class="card"><div class="err" style="display:block">Error: '+esc(err.message||err)+'</div></div>';
+  }
   window.scrollTo(0,0);
 }
 window.addEventListener('hashchange', render);
