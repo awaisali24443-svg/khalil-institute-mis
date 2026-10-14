@@ -457,6 +457,7 @@ async function render(){
     else if(r[0]==='stock'){ viewHtml = vStock(r[1]||'items'); viewMod='stock'; }
     else if(r[0]==='office'){ viewHtml = vOffice(r[1]||'hospital'); viewMod='office'; }
     else if(r[0]==='reports'){ viewHtml = vReports(); viewMod='reports'; }
+    else if(r[0]==='audit'){ viewHtml = vAudit(); viewMod='audit'; }
     else if(r[0]==='backup'){ viewHtml = Promise.resolve(vBackup()); viewMod='backup'; }
     else if(r[0]==='settings'){ viewHtml = vSettings(); viewMod='settings'; }
     else { viewHtml = vDash(); viewMod='dash'; }
@@ -607,6 +608,8 @@ async function vDash(){
   +(recent||'<tr><td colspan="5" class="mut">'+t('d_none')+'</td></tr>')+'</table></div></div>';
 }
 var _stuCache={};
+function isStu(){ return _curUser && _curUser.role==='student'; }
+function adminOnly(html){ return isStu() ? '' : html; }
 function stuName(cnic){
   if(_stuCache[cnic]) return _stuCache[cnic].name||cnic;
   return cnic;
@@ -810,7 +813,7 @@ async function vStudentProfile(cnic){
   var gName = s.gender==='M'?t('f_male'):t('f_female');
   var html = '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_stu'),'#/students'],[s.name,null]])
   +'<div class="between"><div style="display:flex;gap:14px;align-items:center">'+photoHTML(s)+'<div><h2 style="margin:0">'+esc(s.name)+'</h2><div class="mut">'+t('f_roll')+': '+esc(s.roll||'-')+' &middot; '+esc(progName(s.program))+' &middot; '+(s.session||'')+'</div></div>'
-    +'<div class="row"><a class="btn sm" href="#/studentform/'+esc(s.cnic)+'">'+t('p_edit')+'</a><a class="btn sm gold" href="#/collect">'+t('p_collect')+'</a><a class="btn sm red" href="#/fees/fine/'+esc(s.cnic)+'">'+t('fee_add_fine')+'</a><button class="btn sm gh" onclick="window.print()">'+t('p_print')+'</button></div></div>'
+    +'<div class="row">'+adminOnly('<a class="btn sm" href="#/studentform/'+esc(s.cnic)+'">'+t('p_edit')+'</a><a class="btn sm gold" href="#/collect">'+t('p_collect')+'</a><a class="btn sm red" href="#/fees/fine/'+esc(s.cnic)+'">'+t('fee_add_fine')+'</a>')+'<button class="btn sm gh" onclick="window.print()">'+t('p_print')+'</button></div></div>'
     +'<div class="mt"><span class="badge b-'+s.status+'">'+t('f_'+s.status)+'</span></div></div></div>'
   +'<div class="row mt" style="gap:6px"><a class="btn sm gh" href="#/attendance/stu">'+t('nav_at')+'</a><a class="btn sm gh" href="#/academics">'+t('nav_acad')+'</a><a class="btn sm gh" href="#/letters/new">'+t('nav_let')+'</a><a class="btn sm gh" href="#/fees">'+t('nav_fee')+'</a></div></div>'
   +'<div class="card"><h2>'+t('p_personal')+'</h2><table class="tbl">'
@@ -832,7 +835,7 @@ async function vStudentProfile(cnic){
     +'<tr><td style="width:40%;color:var(--mut)">'+t('p_remaining')+'</td><td style="font-weight:800;font-size:1.1em;color:'+(remaining>0?'var(--red)':'var(--g)')+'">'+fmt(remaining)+'</td></tr>'
     +kv(t('p_remarks'),s.remarks)
     +'</table></div>'
-  +'<div class="card"><h2>'+t('p_payhist')+'</h2><div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="#/fees/new/'+esc(s.cnic)+'">'+t('fee_new')+'</a></div>'
+      +'<div class="card"><h2>'+t('p_payhist')+'</h2>'+adminOnly('<div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="#/fees/new/'+esc(s.cnic)+'">'+t('fee_new')+'</a></div>')
     +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th style="text-align:right">'+t('fee_paid')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th><th>'+t('fee_status')+'</th><th></th></tr>'
     +(chRows||'<tr><td colspan="7" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('p_attsum')+' <span class="mut" style="font-size:.7em">(30 '+t('f_days')+')</span></h2><table class="tbl">'
@@ -874,17 +877,17 @@ async function vFees(sub){
   for(var j=0;j<challans.slice(0,60).length;j++){ var c=challans[j], bal=Number(c.amount)-Number(c.paid);
     chRows += '<tr><td>'+esc(c.no)+'</td><td>'+esc(stuName(c.cnic))+'</td><td>'+esc(c.title)+'</td><td style="text-align:right">'+fmt(c.amount)+'</td><td>'+statusBadge(c.status)+(isOverdue(c)?' <span class="badge b-unpaid">'+t('fee_overdue')+'</span>':'')+'</td>'
     +'<td><button class="btn sm gh" onclick="printChallan('+c.id+')">'+t('fee_print')+'</button> '
-    +(bal>0?'<a class="btn sm" href="#/fees/pay/'+c.id+'">'+t('fee_pay')+'</a>':'')+'</td></tr>';
+        +(bal>0?adminOnly('<a class="btn sm" href="#/fees/pay/'+c.id+'">'+t('fee_pay')+'</a>'):'')+'</td></tr>';
   }
-  return '<div class="card"><div class="between"><h2>'+t('fee_struct')+'</h2><div class="row"><button class="btn sm gold" onclick="seedFees()">'+t('fee_addhead')+' ('+t('fee_struct')+' seed)</button></div></div>'
+  return adminOnly('<div class="card"><div class="between"><h2>'+t('fee_struct')+'</h2><div class="row"><button class="btn sm gold" onclick="seedFees()">'+t('fee_addhead')+' ('+t('fee_struct')+' seed)</button></div></div>'
   +'<div class="f2 mt"><div class="frow"><label>'+t('s_prog')+'</label><select id="nh_prog">'+progOpts('lhv')+'</select></div>'
   +'<div class="frow"><label>'+t('fee_head')+'</label><input id="nh_title" placeholder="Admission Fee"></div></div>'
   +'<div class="f2"><div class="frow"><label>'+t('fee_amt')+'</label><input id="nh_amt" inputmode="numeric" placeholder="20000"></div><div class="frow"><label>&nbsp;</label><button class="btn" onclick="addHead()">'+t('fee_addhead')+'</button></div></div>'
-  +'<div class="err" id="fhErr"></div><div id="structList">'+(structHtml||'<p class="mut">'+t('fee_nor')+'</p>')+'</div></div>'
-  +'<div class="card"><h2>'+t('fee_gen_month')+'</h2><div class="f2"><div class="frow"><label>'+t('f_session')+'</label><select id="gm_ses">'+await sesOpts()+'</select></div>'
+    +'<div class="err" id="fhErr"></div><div id="structList">'+(structHtml||'<p class="mut">'+t('fee_nor')+'</p>')+'</div></div>')
+  +adminOnly('<div class="card"><h2>'+t('fee_gen_month')+'</h2><div class="f2"><div class="frow"><label>'+t('f_session')+'</label><select id="gm_ses">'+await sesOpts()+'</select></div>'
   +'<div class="frow"><label>'+t('fee_head')+'</label><select id="gm_head">'+heads.map(function(hh){return '<option value="'+hh.id+'">'+esc(progName(hh.program))+' — '+esc(hh.title)+' ('+fmt(hh.amount)+')</option>';}).join('')+'</select></div></div>'
-  +'<button class="btn gold" onclick="genMonthly()">'+t('fee_gen_month')+'</button></div>'
-  +'<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2><a class="btn" href="#/fees/new/">'+t('fee_new')+'</a></div>'
+  +'<button class="btn gold" onclick="genMonthly()">'+t('fee_gen_month')+'</button></div>')
+  +'<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2>'+adminOnly('<a class="btn" href="#/fees/new/">'+t('fee_new')+'</a>')+'</div>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('s_name')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th>'+t('fee_status')+'</th><th></th></tr>'
   +(chRows||'<tr><td colspan="6" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('fee_dues')+'</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th></tr>'+duesRows+'</table></div></div>';
@@ -1340,7 +1343,28 @@ async function delEmp(cnic){ if(!confirm(t('s_confirm_del'))) return; await DB.d
 
 /* ---------- attendance ---------- */
 var _attBuf = {}, _attDate = null, _attSes = '';
+async function vStuAttendance(){
+  var cnic = _curUser.cnic;
+  var recs = await DB.byIndex('attendance','byStudent',cnic);
+  recs.sort(function(a,b){ return a.date<b.date?1:-1; });
+  var p=0, a=0, l=0;
+  for(var i=0;i<recs.length;i++){ if(recs[i].status==='P')p++; else if(recs[i].status==='A')a++; else l++; }
+  var rows = recs.slice(0,60).map(function(r){
+    var st = r.status==='P'?t('p_present'):r.status==='A'?t('p_absent'):t('at_leave');
+    var cls = r.status==='P'?'b-paid':r.status==='A'?'b-unpaid':'b-partial';
+    return '<tr><td dir="ltr">'+esc(r.date)+'</td><td><span class="badge '+cls+'">'+st+'</span></td></tr>';
+  }).join('');
+  var tot = p+a+l, pct = tot?Math.round(p/tot*100):0;
+  return '<div class="card"><h2>'+t('nav_at')+'</h2>'
+    +'<div class="grid g4"><div class="stat"><div class="n">'+pct+'%</div><div class="l">'+t('p_present')+'</div></div>'
+    +'<div class="stat"><div class="n">'+p+'</div><div class="l">'+t('p_present')+'</div></div>'
+    +'<div class="stat"><div class="n">'+a+'</div><div class="l">'+t('p_absent')+'</div></div>'
+    +'<div class="stat"><div class="n">'+tot+'</div><div class="l">'+t('at_total')+'</div></div></div>'
+    +'<div class="tblwrap"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_status')+'</th></tr>'
+    +(rows||'<tr><td colspan="2" class="mut">'+t('cmn_none')+'</td></tr>')+'</table></div></div>';
+}
 async function vAttendance(sub){
+  if(isStu()) return await vStuAttendance();
   var kind = sub==='emp' ? 'emp' : 'stu';
   var tabs = '<div class="row" style="margin-bottom:14px"><a class="btn sm '+(kind==='stu'?'':'gh')+'" href="#/attendance/stu">'+t('at_stu')+'</a> <a class="btn sm '+(kind==='emp'?'':'gh')+'" href="#/attendance/emp">'+t('at_emp')+'</a></div>';
   var d = _attDate || today();
@@ -1678,10 +1702,10 @@ async function vSubjects(){
   function empName(c){ for(var i=0;i<emps.length;i++) if(emps[i].cnic===c) return emps[i].name; return c||'-'; }
   var rows = all.map(function(s){
     return '<tr><td>'+esc(s.code||'')+'</td><td>'+esc(s.name)+'</td><td>'+esc(progName(s.program))+'</td><td>'+esc(s.sem||'')+'</td><td style="text-align:right">'+esc(s.marks||'')+'</td><td>'+esc(empName(s.teacher))+'</td>'
-    +'<td><button class="btn sm" onclick="subForm('+s.id+')">'+t('cmn_edit')+'</button> <button class="btn sm red" onclick="delSub('+s.id+')">'+t('cmn_del')+'</button></td></tr>';
+    +'<td>'+adminOnly('<button class="btn sm" onclick="subForm('+s.id+')">'+t('cmn_edit')+'</button> <button class="btn sm red" onclick="delSub('+s.id+')">'+t('cmn_del')+'</button>')+'</td></tr>';
   }).join('');
   var empOpts = emps.map(function(e){ return '<option value="'+e.cnic+'">'+esc(e.name)+' ('+esc(e.desig)+')</option>'; }).join('');
-  return '<div class="card"><h2>'+t('ac_sub')+'</h2><div id="subFormWrap"><button class="btn" onclick="subForm(0)">'+t('ac_addsub')+'</button></div>'
+  return '<div class="card"><h2>'+t('ac_sub')+'</h2><div id="subFormWrap">'+adminOnly('<button class="btn" onclick="subForm(0)">'+t('ac_addsub')+'</button>')+'</div>'
   +'<div id="subFormBox"></div>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('ac_code')+'</th><th>'+t('ac_name')+'</th><th>'+t('s_prog')+'</th><th>'+t('ac_sem')+'</th><th style="text-align:right">'+t('ac_marks')+'</th><th>'+t('ac_teacher')+'</th><th></th></tr>'+(rows||'<tr><td colspan="7" class="mut">'+t('cmn_none')+'</td></tr>')+'</table></div></div>'
   +'<div id="empOptsCache" style="display:none">'+empOpts+'</div>';
@@ -1717,6 +1741,7 @@ async function delSub(id){
 /* ----- timetable ----- */
 var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat'];
 async function vTimetable(){
+  var _isStuTT = isStu();
   var subs = await DB.all('subjects');
   var emps = await DB.all('employees');
   var tt = await DB.all('timetable');
@@ -1741,7 +1766,7 @@ async function vTimetable(){
   +'<div class="f2"><div class="frow"><label>'+t('s_prog')+'</label><select id="tt_fprog" onchange="render()">'+PROGRAMS.map(function(p){return '<option value="'+p.k+'"'+(p.k===fprog?' selected':'')+'>'+esc(progName(p.k))+'</option>';}).join('')+'</select></div>'
   +'<div class="frow"><label>'+t('ac_sem')+'</label><select id="tt_fsem" onchange="render()">'+['1','2','3','4','1st Year','2nd Year'].map(function(x){return '<option'+(x===fsem?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div></div>'
   +'<div class="mt" style="overflow-x:auto">'+grid+'</div></div>'
-  +'<div class="card"><h3>'+t('ac_addtt')+'</h3><div class="err" id="ttErr"></div>'
++'<div class="card"><h3>'+t('ac_addtt')+'</h3><div class="err" id="ttErr"></div>'
   +'<div class="f2"><div class="frow"><label>'+t('ac_day')+'</label><select id="tt_day">'+DAYS.map(function(d){return '<option>'+d+'</option>';}).join('')+'</select></div>'
   +'<div class="frow"><label>'+t('ac_period')+'</label><select id="tt_period">'+[1,2,3,4,5,6].map(function(p){return '<option>'+p+'</option>';}).join('')+'</select></div></div>'
   +'<div class="f2"><div class="frow"><label>'+t('ac_subject')+'</label><select id="tt_sub">'+subOpts+'</select></div>'
@@ -1767,7 +1792,7 @@ async function vExams(){
     return '<tr><td>'+esc(e.name)+'</td><td>'+esc(progName(e.program))+'</td><td>'+esc(e.sem)+'</td><td dir="ltr">'+esc(e.date||'')+'</td>'
     +'<td><a class="btn sm" href="#/academics/exam/'+e.id+'">'+t('ac_open')+'</a> <button class="btn sm red" onclick="delExam('+e.id+')">'+t('cmn_del')+'</button></td></tr>';
   }).join('');
-  return '<div class="card"><h2>'+t('ac_ex')+'</h2><p><button class="btn" onclick="examForm(0)">'+t('ac_addexam')+'</button></p><div id="examFormBox"></div>'
+  return '<div class="card"><h2>'+t('ac_ex')+'</h2><p>'+adminOnly('<button class="btn" onclick="examForm(0)">'+t('ac_addexam')+'</button>')+'</p><div id="examFormBox"></div>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('ac_exname')+'</th><th>'+t('s_prog')+'</th><th>'+t('ac_sem')+'</th><th>'+t('fee_date')+'</th><th></th></tr>'+(rows||'<tr><td colspan="5" class="mut">'+t('cmn_none')+'</td></tr>')+'</table></div></div>';
 }
 async function examForm(id){
