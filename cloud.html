@@ -389,7 +389,8 @@ async function doLogout(){
   try{ await fetch(SB.url+'/auth/v1/logout', {method:'POST', headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||SB.anon)}}); }catch(e){}
   _curUser=null; SB.token=null; DB.clearCache(); _kbHelp=false; _shellBuilt=false;
   sessionStorage.removeItem('kin_token'); sessionStorage.removeItem('kin_refresh'); sessionStorage.removeItem('kin_uid'); sessionStorage.removeItem('kin_email');
-  location.hash='#/login';
+  document.getElementById('app').innerHTML = vLogin();
+  if(location.hash!=='#/login') location.hash='#/login'; else render();
 }
 function go(r){ location.hash = '#/'+r; }
 
@@ -479,7 +480,11 @@ async function render(){
   }
   window.scrollTo(0,0);
 }
-window.addEventListener('hashchange', render);
+window.addEventListener('hashchange', function(){
+  var hh = location.hash;
+  if(_curUser && hh && hh!=='#/login' && hh!=='#/dash') sessionStorage.setItem('kin_lasttab', hh);
+  render();
+});
 
 /* ---------- login ---------- */
 var _loginMode = 'student';
