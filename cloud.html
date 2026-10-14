@@ -499,7 +499,7 @@ async function doLogin(e){
     _curUser._tok = j.access_token;
     if(_curUser.role==='pending'){ showErr('lgErr', t('login_pending')); doLogout(); return false; }
     if(_curUser.role==='student' && _curUser.cnic){ location.hash = '#/student/'+_curUser.cnic; }
-    else location.hash = '#/'+((_curUser.rights||[])[0]||'dash');
+    else location.hash = sessionStorage.getItem('kin_lasttab') || '#/'+((_curUser.rights||[])[0]||'dash');
   }catch(err){ showErr('lgErr', t('login_bad')); }
   if(btn){ btn.disabled = false; btn.textContent = t('login_btn'); }
   return false;
