@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KIN Management System</title>
 <style>
-:root{--g:#095e43;--gd:#074331;--gold:#d4a017;--bg:#eef3f0;--tx:#1f2d3d;--mut:#6b7a72;--card:#fff;--red:#c62828;--line:#dde5e1;color-scheme:light}
+:root{--g:#0b6e4f;--gd:#084c38;--gold:#e8a317;--bg:#f1f5f4;--tx:#1a2b3c;--mut:#64748b;--card:#ffffff;--red:#dc2626;--line:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05);--radius:14px;color-scheme:light}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:14.5px}
 [dir="rtl"] body{text-align:right}
@@ -18,11 +18,12 @@ nav.tabs{background:#fff;border-bottom:2px solid var(--line);display:flex;gap:2p
 nav.tabs a{padding:12px 16px;text-decoration:none;color:var(--tx);font-weight:600;font-size:14px;white-space:nowrap;border-bottom:3px solid transparent}
 nav.tabs a.on{color:var(--g);border-bottom-color:var(--g)}
 .wrap{max-width:1080px;margin:0 auto;padding:18px 14px 60px}
-.card{background:var(--card);border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:18px;margin-bottom:16px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px;border:1px solid #eef2f7}
 .card h2{font-size:17px;color:var(--g);margin-bottom:12px}
 .grid{display:grid;gap:14px}
 .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.stat{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:16px;border-top:4px solid var(--g)}
+.stat{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;border:1px solid #eef2f7;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--g),#10b981)}
 .stat .n{font-size:26px;font-weight:800;color:var(--g)}
 .stat .l{font-size:13px;color:var(--mut);margin-top:2px}
 table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -30,7 +31,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 [dir="rtl"] .tbl th{text-align:right}
 .tbl td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
 .tbl tr:hover td{background:#f6faf7}
-.btn{display:inline-block;background:var(--g);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--g),#0d7a56);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 2px 6px rgba(11,110,79,.25)}
 .btn:hover{background:var(--gd)}
 .btn.gold{background:var(--gold);color:#3a2c00}.btn.gold:hover{background:#b8890f}
 .btn.red{background:var(--red)}.btn.red:hover{background:#a11f1f}
