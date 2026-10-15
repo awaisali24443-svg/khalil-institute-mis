@@ -1,3 +1,6 @@
+-- ⚠️  WARNING: This file creates TEST accounts (admin/accountant/teacher/reception).
+-- DO NOT run in production. Create real staff via Supabase Dashboard → Authentication.
+-- Delete test accounts before going live.
 -- ============================================================
 -- KIN Cloud — assign roles to the 5 test logins.
 -- Run AFTER the test users are created (via sign-up).
