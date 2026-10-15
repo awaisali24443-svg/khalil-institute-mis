@@ -14,19 +14,21 @@ Complete documentation — every module, every role, every feature, from A to Z.
 
 **Staff** (Staff tab — type just the username):
 
-| Role | Username | Password | Access |
-|------|----------|----------|--------|
-| Admin | `admin` | `admin123` | All 16 tabs |
-| Accountant | `accountant` | `admin123` | Dashboard, Fees, Accounts, Reports, SMS |
-| Teacher | `teacher` | `admin123` | Dashboard, Attendance, Academics, Library |
-| Reception | `reception` | `admin123` | Dashboard, Students, Letters, Library, Office, SMS |
+| Role | Username | Access |
+|------|----------|--------|
+| Admin | `admin` | All 16 tabs |
+| Accountant | `accountant` | Dashboard, Fees, Accounts, Reports, SMS |
+| Teacher | `teacher` | Dashboard, Attendance, Academics, Library |
+| Reception | `reception` | Dashboard, Students, Letters, Library, Office, SMS |
+
+> **Passwords:** Test accounts use simple passwords for demo only. **Change all passwords before going live** (Supabase → Authentication → Users → edit). Never publish real passwords.
 
 **Student** (Student tab):
 
 | Field | Value |
 |-------|-------|
-| CNIC | `3520212345671` |
-| Mobile (password) | `03001234567` |
+| CNIC | `3520212345671` (demo student) |
+| Mobile | Use the student's registered mobile number |
 
 Students log in with their **CNIC number** as username and **mobile number** as password. No separate accounts to create — when you add a student, their login is created automatically.
 
