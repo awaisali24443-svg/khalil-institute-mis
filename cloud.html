@@ -922,7 +922,7 @@ async function vPayLedger(cnic){
     var dt = esc(p.date||'');
     if(p.time) dt += ' <span class="mut">'+esc(p.time.slice(0,5))+'</span>';
     return '<tr><td dir="ltr" style="white-space:nowrap">'+dt+'</td>'
-      +'<td dir="ltr">'+esc(p.recNo||'-')+'</td>'
+      +'<td dir="ltr"><a href="javascript:printReceipt('+p.id+')" title="'+t('fee_print')+'" style="font-weight:700;color:var(--g)">'+esc(p.recNo||'-')+'</a></td>'
       +'<td>'+forWhat+'</td>'
       +'<td style="text-align:right">'+fmt(p.amount)+'</td>'
       +'<td>'+esc(methodName(p.method))+'</td>'
@@ -1193,6 +1193,10 @@ async function vAudit(){
       var dd = typeof d==='string'?JSON.parse(d):d;
       if(dd&&dd.new&&dd.new.data) det = esc(JSON.stringify(dd.new.data).slice(0,120));
       else if(dd&&dd.old&&dd.old.data) det = esc(JSON.stringify(dd.old.data).slice(0,120));
+      try{
+        var recNo = (dd&&dd.new&&dd.new.recNo)||(dd&&dd.new&&dd.new.data&&dd.new.data.recNo);
+        if(recNo) det = '<b dir="ltr">'+esc(recNo)+'</b> '+det;
+      }catch(e2){}
     }catch(e){}
     return '<tr><td dir="ltr" style="white-space:nowrap">'+esc(x.created_at||'').slice(0,19).replace('T',' ')+'</td><td>'+who+'</td><td>'+what+'</td><td style="font-size:12px">'+det+'</td></tr>';
   }).join('');
@@ -2263,7 +2267,7 @@ async function qcCollect(){
     }
   }
   toast(t('qc_done')+': '+t('cmn_rs')+' '+fmt(tot)+' ('+n+')');
-  if(n>0 && confirm(t('qc_printq'))){ var lastPid = null; try{ var ps = await DB.all('payments'); if(ps.length) lastPid = ps[ps.length-1].id; }catch(e){} if(lastPid) printReceipt(lastPid); }
+  if(n>0){ var lastPid = null; try{ var ps = await DB.all('payments'); if(ps.length) lastPid = ps[ps.length-1].id; }catch(e){} if(lastPid) setTimeout(function(){printReceipt(lastPid);},500); }
   if(_qcStu) qcPick(_qcStu); else render();
 }
 /* ---------- attendance: mark all present ---------- */
