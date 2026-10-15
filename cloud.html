@@ -470,7 +470,11 @@ function bindPrefetch(){
     })(tabs[i]);
   }
 }
+var _renderPending=false;
 async function render(){
+  if(_renderPending) return; _renderPending=true;
+  await new Promise(function(r){requestAnimationFrame(r);});
+  _renderPending=false;
   var app = document.getElementById('app');
   var h = location.hash || '#/dash';
   var u = await curUser();
