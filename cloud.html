@@ -262,7 +262,7 @@ var DB = {
     return h;
   },
   _cache: {},
-  _cacheTTL: 30000,
+  _cacheTTL: 300000,
   _cget: function(t){ var c = DB._cache[t]; return (c && (Date.now()-c.ts) < DB._cacheTTL) ? c.rows : null; },
   _cset: function(t, rows){ DB._cache[t] = {ts: Date.now(), rows: rows}; },
   _cinv: function(t){ delete DB._cache[t]; },
@@ -613,7 +613,7 @@ async function doLogin(e){
 var _duesMap = null, _duesMapTs = 0;
 async function duesMap(){
   // single-pass: build {cnic: dues} for ALL students in O(challans)
-  if(_duesMap && (Date.now()-_duesMapTs) < 30000) return _duesMap;
+  if(_duesMap && (Date.now()-_duesMapTs) < 300000) return _duesMap;
   var ch = await DB.all('challans'), m = {};
   for(var i=0;i<ch.length;i++){
     var c = ch[i], bal = (Number(c.amount)||0)-(Number(c.paid)||0);
@@ -630,7 +630,7 @@ function invDuesMap(){ _duesMap = null; }
 async function vDash(){
   var results = await Promise.all([DB.all('students'), DB.all('payments'), DB.all('challans')]);
   var students = results[0], payments = results[1], challans = results[2];
-  if(!students.length){ await new Promise(function(r){setTimeout(r,1200);}); DB._cinv('students'); students = await DB.all('students'); }
+  if(!students.length){ DB._cinv('students'); students = await DB.all('students'); }
   _stuCache={}; for(var si=0;si<students.length;si++) _stuCache[students[si].cnic]=students[si];
   var m = ym(today()), coll=0, dues=0;
   for(var i=0;i<payments.length;i++) if(ym(payments[i].date)===m) coll += Number(payments[i].amount)||0;
@@ -739,7 +739,9 @@ async function vStudents(q){
   +'<tbody id="stuRows">'+(rows||'<tr><td colspan="7" class="mut">'+t('s_nor')+'</td></tr>')+'</tbody></table></div></div>'
   '';
 }
+var _stuSearchT=null;
 function stuSearch(){ var v=document.getElementById('stuQ').value.trim(); location.hash='#/students/'+encodeURIComponent(v); }
+function stuSearchDb(){ clearTimeout(_stuSearchT); _stuSearchT=setTimeout(stuSearch,400); }
 async function addSession(){
   var n=val('ses_name'), ty=val('ses_type'), y=Number(val('ses_year'));
   if(!n||!y){ toast(t('f_bad')); return; }
