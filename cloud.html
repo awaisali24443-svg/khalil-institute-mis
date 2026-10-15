@@ -1200,12 +1200,17 @@ async function vAudit(){
     var det = '';
     try{
       var dd = typeof d==='string'?JSON.parse(d):d;
-      if(dd&&dd.new&&dd.new.data) det = esc(JSON.stringify(dd.new.data).slice(0,120));
-      else if(dd&&dd.old&&dd.old.data) det = esc(JSON.stringify(dd.old.data).slice(0,120));
-      try{
-        var recNo = (dd&&dd.new&&dd.new.recNo)||(dd&&dd.new&&dd.new.data&&dd.new.data.recNo);
-        if(recNo) det = '<b dir="ltr">'+esc(recNo)+'</b> '+det;
-      }catch(e2){}
+      var rec = (dd&&dd.new&&dd.new.data)||(dd&&dd.new)||(dd&&dd.old&&dd.old.data)||(dd&&dd.old)||{};
+      if(rec && typeof rec==='object' && Object.keys(rec).length){
+        var bits = [];
+        if(rec.recNo) bits.push('<b dir="ltr" style="color:var(--g)">'+esc(rec.recNo)+'</b>');
+        if(rec.name) bits.push('<b>'+esc(rec.name)+'</b>');
+        if(rec.amount!=null) bits.push('Rs '+fmt(rec.amount));
+        if(rec.cnic) bits.push('<span dir="ltr" class="mut">'+esc(rec.cnic)+'</span>');
+        if(rec.title) bits.push(esc(rec.title));
+        if(rec.no) bits.push('<span dir="ltr" class="mut">'+esc(rec.no)+'</span>');
+        det = bits.length ? bits.join(' &middot; ') : esc(JSON.stringify(rec).slice(0,100));
+      }
     }catch(e){}
     return '<tr><td dir="ltr" style="white-space:nowrap">'+esc(x.created_at||'').slice(0,19).replace('T',' ')+'</td><td>'+who+'</td><td>'+what+'</td><td style="font-size:12px">'+det+'</td></tr>';
   }).join('');
