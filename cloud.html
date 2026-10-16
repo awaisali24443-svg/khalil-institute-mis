@@ -840,6 +840,7 @@ async function vDash(){
 }
 var _stuCache={};
 function isStu(){ return _curUser && _curUser.role==='student'; }
+function isAdmin(){ return _curUser && _curUser.role==='admin'; }
 function adminOnly(html){ return isStu() ? '' : html; }
 function stuName(cnic){
   if(_stuCache[cnic]) return _stuCache[cnic].name||cnic;
