@@ -134,7 +134,7 @@ opacity:.045;pointer-events:none;z-index:0}
 /* KIN Management System v1 — offline-first, single file. Data: IndexedDB. */
 var T={
 en:{app_sub:"Management System",nav_dash:"Dashboard",nav_stu:"Students",nav_fee:"Fees",nav_rep:"Reports",nav_bak:"Backup",nav_set:"Settings",logout:"Logout",lang:"اردو",
-login_title:"Staff Login",login_pass:"Password",login_btn:"Login",login_bad:"Wrong password. Try again.",login_pending:"Your account is not activated yet. Contact the administrator.",login_student:"Student",login_staff:"Staff",login_cnic:"CNIC Number",login_phone:"Mobile Number (password)",login_cnic_bad:"Enter a valid 13-digit CNIC number.",kb_title:"Keyboard Shortcuts",kb_tabs:"Switch tabs",kb_search:"Quick student search",kb_help:"Show this help",kb_back:"Back to dashboard",qs_ph:"Search name, CNIC or roll no…",qs_none:"No students found.",f_close:"Close",login_hint:"Students: CNIC number + mobile number. Staff: username (e.g. admin) + password.",login_forgot:"Forgot password?",login_hint2:"Enter your CNIC and password to login.",fl_title:"Set Your Password",fl_sub:"This is your first login. Please set a new password.",fl_save:"Save and Continue",sq_pick:"Security Question",sq_answer:"Your Answer",sq_mother:"What is your mother name?",sq_school:"What was your first school name?",sq_district:"In which district were you born?",sq_teacher:"Who was your favourite teacher?",sq_food:"What is your favourite food?",fp_title:"Reset Password",fp_next:"Next",fp_reset:"Reset Password",fp_nosq:"No security question set. Contact admin.",fp_wrong:"Wrong answer. Try again.",fp_done:"Request sent! Contact admin to complete the reset.",nudge_title:"Secure Your Account",nudge_sub:"You are using the default password. We recommend changing it.",nudge_change:"Change Now",nudge_later:"Remind Me Later",
+login_title:"Staff Login",login_pass:"Password",login_btn:"Login",login_bad:"Wrong password. Try again.",login_pending:"Your account is not activated yet. Contact the administrator.",login_student:"Student",login_staff:"Staff",login_cnic:"CNIC Number",login_phone:"Mobile Number (password)",login_cnic_bad:"Enter a valid 13-digit CNIC number.",kb_title:"Keyboard Shortcuts",kb_tabs:"Switch tabs",kb_search:"Quick student search",kb_help:"Show this help",kb_back:"Back to dashboard",qs_ph:"Search name, CNIC or roll no…",qs_none:"No students found.",f_close:"Close",login_hint:"Students: CNIC number + mobile number. Staff: username (e.g. admin) + password.",login_forgot:"Forgot password?",login_hint2:"Enter your CNIC and password to login.",fl_title:"Set Your Password",fl_sub:"This is your first login. Please set a new password.",fl_save:"Save and Continue",sq_pick:"Security Question",sq_answer:"Your Answer",sq_mother:"What is your mother name?",sq_school:"What was your first school name?",sq_district:"In which district were you born?",sq_teacher:"Who was your favourite teacher?",sq_food:"What is your favourite food?",fp_title:"Reset Password",fp_next:"Next",fp_reset:"Reset Password",fp_nosq:"No security question set. Contact admin.",fp_wrong:"Wrong answer. Try again.",fp_done:"Request sent! Contact admin to complete the reset.",nudge_title:"Secure Your Account",nudge_sub:"You are using the default password. We recommend changing it.",nudge_change:"Change Now",nudge_later:"Remind Me Later",su_title:"Welcome to KIN MIS",su_sub:"Let us set up your system in 4 easy steps.",su_s1:"Set Your Password",su_s1d:"Choose a strong password for your admin account.",su_s2:"Security Question",su_s2d:"If you forget your password, this will help you reset it.",su_s3:"Payment Details",su_s3d:"Add your bank account and Easypaisa for online payments. You can skip this for now.",su_s4:"All Done!",su_s4d:"Your system is ready. You can now add staff, admit students, and start collecting fees.",su_next:"Next",su_back:"Back",su_skip:"Skip for now",su_start:"Go to Dashboard",
 d_total:"Total Students",d_coll:"Collected This Month",d_dues:"Total Dues",d_recent:"Recent Payments",d_add:"Add Student",d_challan:"Fee Challans",d_none:"No payments yet",d_view:"View All",
 s_title:"Students",s_search:"Search name, CNIC or phone…",s_add:"Add Student",s_name:"Name",s_cnic:"CNIC",s_phone:"Phone",s_prog:"Program",s_dues:"Dues (Rs)",s_act:"Actions",s_edit:"Edit",s_del:"Delete",s_pay:"Fees",s_nor:"No students found",s_confirm_del:"Delete this student and ALL their fee records? This cannot be undone.",
 f_name:"Full name",f_father:"Father name",f_gender:"Gender",f_male:"Male",f_female:"Female",f_dob:"Date of birth",f_cnic:"CNIC / B-Form",f_phone:"Mobile",f_wa:"WhatsApp",f_email:"Email",f_dist:"District",f_addr:"Address",f_qual:"Qualification",f_board:"Board",f_marks:"Marks %",f_year:"Passing year",f_prog:"Program",f_src:"Source",f_save:"Save",f_cancel:"Cancel",f_dup:"This CNIC already exists in the system.",f_bad:"Please correct the fields and try again.",pay_fail_retry:"Payment failed — please try again. No amount was recorded.",f_cnic_lock:"CNIC cannot be changed after admission. Contact admin if correction is needed.",f_phone_warn:"Changing the phone number does not change the login password. Reset it in Supabase → Authentication.",f_adm:"Admission date",p_sno:"S. No",p_domicile:"Domicile",p_ssc:"SSC Marks",p_hssc:"HSSC Marks",p_shift:"Shift",p_morning:"Morning",p_evening:"Evening",p_examreg:"Board Reg No",p_duration:"Duration",p_remarks:"Remarks",p_feeplan:"Committed Fee Plan (per student)",p_admfee:"Admission Fee",p_monfee:"Monthly Fee",p_regfee:"Registration Fee",p_examfee:"Exam Fee",p_finefee:"Fine Fee",p_other:"Other",p_totalfees:"Total Fees",p_totalpaid:"Total Paid",p_remaining:"Remaining",p_profile:"Student Profile",p_personal:"Personal Information",p_academic:"Academic Information",p_feestatus:"Fee Status",p_edit:"Edit Profile",p_collect:"Collect Fee",p_payhist:"Challans & Payments",p_attsum:"Attendance Summary",p_present:"Present",p_absent:"Absent",p_print:"Print Profile",f_days:"days",p_photo:"Photo",f_status:"Status",f_active:"Active",f_left:"Left",f_done:"Completed",
@@ -492,6 +492,7 @@ async function render(){
     else if(r[0]==='students'){ viewHtml = vStudents(r[1]||''); viewMod='students'; }
     else if(r[0]==='student'){ viewHtml = r[1]==='new'?await vStudentForm('new'):await vStudentProfile(r[1]||''); viewMod='students'; }
     else if(r[0]==='firstlogin'){ viewHtml = await vFirstLogin(); viewMod=''; }
+    else if(r[0]==='setup'){ viewHtml = await vSetup(); viewMod=''; }
     else if(r[0]==='staff'){ viewHtml = vLogin(); viewMod=''; }
     else if(r[0]==='studentform'){ viewHtml = vStudentForm(r[1]||'new'); viewMod='students'; }
     else if(r[0]==='fees'){ viewHtml = vFees(r.slice(1).join('/')); viewMod='fees'; }
@@ -593,8 +594,13 @@ async function doLogin(e){
     // Gentle nudge: if password still default, show popup (not forced)
     var needsPwChange = await checkFirstLogin(_curUser);
     if(_curUser.role==='student' && _curUser.cnic){ location.hash = '#/student/'+_curUser.cnic; }
-    else location.hash = sessionStorage.getItem('kin_lasttab') || '#/'+((_curUser.rights||[])[0]||'dash');
-    if(needsPwChange){ setTimeout(function(){ showPwNudge(); }, 800); }
+    else{
+      // Check if first-time setup needed (admin, no students, no payment config)
+      var needsSetup = await checkNeedsSetup(_curUser);
+      if(needsSetup){ location.hash = '#/setup'; }
+      else location.hash = sessionStorage.getItem('kin_lasttab') || '#/'+((_curUser.rights||[])[0]||'dash');
+    }
+    if(needsPwChange && location.hash!=='#/setup'){ setTimeout(function(){ showPwNudge(); }, 800); }
     // prefetch
     setTimeout(function(){ Promise.all([DB.all('students'),DB.all('challans'),DB.all('programs')]).catch(function(){}); },100);
   }catch(err){ showErr('lgErr', err.message||t('login_bad')); }
@@ -687,6 +693,15 @@ async function fpStep2(cnic){
   await DB.put('students', s);
   document.getElementById('fpStep2').innerHTML = '<div class="ok" style="display:block">'+t('fp_done')+'</div>';
 }
+/* ---------- first-time setup detection ---------- */
+async function checkNeedsSetup(u){
+  if(!u || u.role!=='admin') return false;
+  try{
+    var setupDone = await setting('setupDone','0');
+    if(setupDone==='1') return false;
+    return true;
+  }catch(e){ return false; }
+}
 /* ---------- password change nudge (popup, not forced) ---------- */
 function showPwNudge(){
   if(document.getElementById('pwNudge')) return;
@@ -700,6 +715,82 @@ function showPwNudge(){
   +'<button class="btn gh" onclick="document.getElementById(\'pwNudge\').remove()">'+t('nudge_later')+'</button>'
   +'</div></div>';
   document.body.appendChild(d);
+}
+/* ---------- first-time setup wizard (for non-technical clients) ---------- */
+var _setupStep = 1;
+async function vSetup(){
+  if(!_curUser || _curUser.role!=='admin') return '<div class="card">'+t('login_bad')+'</div>';
+  var steps = [t('su_s1'), t('su_s2'), t('su_s3'), t('su_s4')];
+  var html = '<div class="loginwrap"><div class="logincard" style="max-width:520px">'
+  +'<img src="'+LOGO+'" style="width:64px;height:64px;object-fit:contain" alt="logo">'
+  +'<h1>'+t('su_title')+'</h1><p class="mut">'+t('su_sub')+'</p>'
+  // Progress
+  +'<div style="display:flex;gap:6px;margin:16px 0">';
+  for(var i=1;i<=4;i++){
+    html += '<div style="flex:1;height:6px;border-radius:3px;background:'+(i<=_setupStep?'var(--g)':'#e2e8f0')+'"></div>';
+  }
+  html += '</div><div class="err" id="suErr"></div><div id="suBody">'+setupStepHTML()+'</div></div></div>';
+  return html;
+}
+function setupStepHTML(){
+  if(_setupStep===1){
+    return '<h2>'+t('su_s1')+'</h2><p class="mut">'+t('su_s1d')+'</p>'
+    +'<div class="frow" style="text-align:left"><label>'+t('pw_new')+'</label>'+pwField('su_pw1')+'</div>'
+    +'<div class="frow" style="text-align:left"><label>'+t('pw_confirm')+'</label>'+pwField('su_pw2')+'</div>'
+    +'<button class="btn" onclick="suNext(1)" style="width:100%">'+t('su_next')+'</button>';
+  } else if(_setupStep===2){
+    var qOpts = ['sq_mother','sq_school','sq_district','sq_teacher','sq_food'].map(function(q){ return '<option value="'+q+'">'+t(q)+'</option>'; }).join('');
+    return '<h2>'+t('su_s2')+'</h2><p class="mut">'+t('su_s2d')+'</p>'
+    +'<div class="frow" style="text-align:left"><label>'+t('sq_pick')+'</label><select id="su_sq">'+qOpts+'</select></div>'
+    +'<div class="frow" style="text-align:left"><label>'+t('sq_answer')+'</label><input id="su_sa" autocomplete="off"></div>'
+    +'<div class="row"><button class="btn gh" onclick="suBack()">'+t('su_back')+'</button><button class="btn" onclick="suNext(2)">'+t('su_next')+'</button></div>';
+  } else if(_setupStep===3){
+    return '<h2>'+t('su_s3')+'</h2><p class="mut">'+t('su_s3d')+'</p>'
+    +'<div class="frow" style="text-align:left"><label>'+t('set_bank')+'</label><input id="su_bank" dir="ltr" placeholder="PK36..."></div>'
+    +'<div class="frow" style="text-align:left"><label>'+t('set_easy')+'</label><input id="su_easy" dir="ltr" placeholder="0345..."></div>'
+    +'<div class="row"><button class="btn gh" onclick="suBack()">'+t('su_back')+'</button><button class="btn" onclick="suNext(3)">'+t('su_next')+'</button></div>'
+    +'<div style="margin-top:8px"><a href="javascript:suSkip()" style="font-size:13px">'+t('su_skip')+'</a></div>';
+  } else {
+    return '<h2>'+t('su_s4')+'</h2><p class="mut">'+t('su_s4d')+'</p>'
+    +'<div style="font-size:48px;margin:16px 0">\u2705</div>'
+    +'<button class="btn" onclick="suFinish()" style="width:100%">'+t('su_start')+'</button>';
+  }
+}
+function suBack(){ _setupStep--; document.getElementById('suBody').innerHTML = setupStepHTML(); }
+function suSkip(){ _setupStep++; document.getElementById('suBody').innerHTML = setupStepHTML(); }
+async function suNext(step){
+  if(step===1){
+    var p1 = val('su_pw1'), p2 = val('su_pw2');
+    if(!p1 || p1.length<6){ showErr('suErr', t('pw_short')); return; }
+    if(p1!==p2){ showErr('suErr', t('pw_mismatch')); return; }
+    try{
+      var r = await fetch(SB.url+'/auth/v1/user', {method:'PUT',
+        headers:{'apikey':SB.anon,'Authorization':'Bearer '+SB.token,'Content-Type':'application/json'},
+        body: JSON.stringify({password:p1})});
+      if(!r.ok) throw new Error();
+      var p = await DB.get('profiles', _curUser.id) || {id:_curUser.id};
+      p.pwChanged = true;
+      await DB.put('profiles', p);
+    }catch(e){ showErr('suErr', t('pw_fail')); return; }
+  } else if(step===2){
+    var sq = val('su_sq'), sa = val('su_sa').trim();
+    if(!sa){ showErr('suErr', t('fp_wrong')); return; }
+    var p2 = await DB.get('profiles', _curUser.id) || {id:_curUser.id};
+    p2.secQ = sq; p2.secA = btoa(unescape(encodeURIComponent(sa.toLowerCase())));
+    await DB.put('profiles', p2);
+  } else if(step===3){
+    var bank = val('su_bank').trim(), easy = val('su_easy').trim();
+    if(bank) await setSetting('bankAccount', bank);
+    if(easy) await setSetting('easypaisa', easy);
+  }
+  _setupStep++;
+  // Update progress + body
+  var w = await vSetup(); document.getElementById('app').innerHTML = w;
+}
+async function suFinish(){
+  await setSetting('setupDone','1');
+  _setupStep = 1;
+  location.hash = '#/dash';
 }
 /* ---------- dashboard ---------- */
 var _duesMap = null, _duesMapTs = 0;
