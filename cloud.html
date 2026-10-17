@@ -405,7 +405,7 @@ async function fetchProfile(uid, email){
 }
 
 /* ---------- shell ---------- */
-var MODULES = [['dash','nav_dash'],['students','nav_stu'],['fees','nav_fee'],['hr','nav_hr'],['attendance','nav_at'],['accounts','nav_ac'],['reports','nav_rep'],['backup','nav_bak'],['settings','nav_set'],['academics','nav_acad'],['letters','nav_let'],['library','nav_lib'],['stock','nav_stock'],['office','nav_off'],['audit','nav_audit'],['sms','nav_sms']];
+var MODULES = [['dash','nav_dash'],['students','nav_stu'],['fees','nav_fee'],['attendance','nav_at'],['academics','nav_acad'],['hr','nav_hr'],['accounts','nav_ac'],['reports','nav_rep'],['sms','nav_sms'],['library','nav_lib'],['stock','nav_stock'],['office','nav_off'],['letters','nav_let'],['audit','nav_audit'],['backup','nav_bak'],['settings','nav_set']];
 var _curUser = null;
 async function curUser(){
   var tok = sessionStorage.getItem('kin_token');
@@ -894,14 +894,25 @@ function photoPick(inp){
 }
 function photoClear(){ _photoData=''; var nm=val('f_name')||'?'; document.getElementById('phPrev').innerHTML='<span class="ph-ph">'+esc(nm.trim().charAt(0).toUpperCase())+'</span>'; var i=document.getElementById('f_photo'); if(i) i.value=''; }
 /* ---------- students ---------- */
+var _stuFilter = {prog:'', sort:'name'};
 async function vStudents(q){
   await warmStuCache();
   var students = await DB.all('students');
   q=(q||'').toLowerCase();
+  // Sort: name A-Z (default), recent, or highest dues
+  if(_stuFilter.sort==='recent'){
+    students.sort(function(a,b){ return (b.adm||'')<(a.adm||'')?-1:1; });
+  } else if(_stuFilter.sort==='dues'){
+    // dues sort applied after duesOf computed - placeholder, sorted by name for now
+    students.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  } else {
+    students.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  }
   var rows='';
   for(var i=0;i<students.length;i++){
     var s=students[i];
     if(q && (s.name+' '+s.cnic+' '+(s.phone||'')).toLowerCase().indexOf(q)<0) continue;
+    if(_stuFilter.prog && s.program!==_stuFilter.prog) continue;
     var d = await duesOf(s.cnic);
     rows += '<tr><td>'+esc(s.roll||'-')+'</td><td>'+photoHTML(s,'ph-sm')+'<a href="#/student/'+esc(s.cnic)+'">'+esc(s.name)+'</a></td><td dir="ltr">'+esc(s.cnic)+'</td><td dir="ltr">'+esc(s.phone||'-')+'</td><td>'+esc(progName(s.program))+'</td>'
     +'<td style="text-align:right;color:'+(d>0?'var(--red)':'var(--g)')+';font-weight:700">'+fmt(d)+'</td>'
@@ -917,7 +928,14 @@ async function vStudents(q){
   +'<div class="frow"><label>&nbsp;</label><button class="btn" onclick="addSession()">'+t('ses_add')+'</button></div></div>'
   +'<table class="tbl mt"><tr><th>'+t('ses_name')+'</th><th>'+t('ses_type')+'</th><th>'+t('ses_year')+'</th><th>'+t('fee_status')+'</th><th>'+t('cmn_actions')+'</th></tr>'+(sesRows||'<tr><td colspan="5" class="mut">'+t('s_nor')+'</td></tr>')+'</table></div>'
   +'<div class="card"><div class="between"><h2>'+t('s_title')+'</h2><a class="btn" href="#/studentform/new">'+t('s_add')+'</a></div>'
-  +'<div class="mt"><input class="search" id="stuQ" placeholder="'+t('s_search')+'" value="'+esc(q)+'" onkeydown="if(event.key===\'Enter\')stuSearch()\"><button class="btn sm" onclick="stuSearch()">&#128269;</button></div>'
+  +'<div class="mt"><input class="search" id="stuQ" placeholder="'+t('s_search')+'" value="'+esc(q)+'" onkeydown="if(event.key===\'Enter\')stuSearch()\" oninput="stuSearchDb()"><button class="btn sm" onclick="stuSearch()">&#128269;</button></div>'
+  +'<div class="row mt" style="gap:8px;flex-wrap:wrap">'
+  +'<select id="fltProg" onchange="stuFilterChg()" style="max-width:200px"><option value="">'+t('flt_allprog')+'</option>'+progOpts(_stuFilter.prog)+'</select>'
+  +'<select id="fltSort" onchange="stuFilterChg()" style="max-width:180px">'
+  +'<option value="name"'+(_stuFilter.sort==='name'?' selected':'')+'>'+t('flt_nameaz')+'</option>'
+  +'<option value="recent"'+(_stuFilter.sort==='recent'?' selected':'')+'>'+t('flt_recent')+'</option>'
+  +'<option value="dues"'+(_stuFilter.sort==='dues'?' selected':'')+'>'+t('flt_dues')+'</option>'
+  +'</select></div>'
   +recentSearchesHTML()
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('f_roll')+'</th><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('s_dues')+'</th><th>'+t('s_act')+'</th></tr>'
   +'<tbody id="stuRows">'+(rows||'<tr><td colspan="7" class="mut">'+t('s_nor')+'</td></tr>')+'</tbody></table></div></div>'
@@ -925,6 +943,18 @@ async function vStudents(q){
 }
 var _stuSearchT=null;
 function stuSearch(){ var v=document.getElementById('stuQ').value.trim(); location.hash='#/students/'+encodeURIComponent(v); }
+function progOpts(sel){
+  var progs = {};
+  for(var k in _stuCache){ var p=_stuCache[k].program; if(p) progs[p]=1; }
+  return Object.keys(progs).sort().map(function(p){
+    return '<option value="'+esc(p)+'"'+(p===sel?' selected':'')+'>'+esc(progName(p))+'</option>';
+  }).join('');
+}
+function stuFilterChg(){
+  _stuFilter.prog = val('fltProg');
+  _stuFilter.sort = val('fltSort');
+  render();
+}
 function stuSearchDb(){ clearTimeout(_stuSearchT); _stuSearchT=setTimeout(stuSearch,400); }
 async function addSession(){
   var n=val('ses_name'), ty=val('ses_type'), y=Number(val('ses_year'));
@@ -1345,10 +1375,20 @@ async function printReceipt(pid){
   var bank = await setting('bankAccount',''), easy = await setting('easypaisa','');
   function oneCopy(copyLabel){
     var rows = '';
-    var heads = [['admission','Admission Fee'],['tuition','Tuition Fee'],['exam','Examination Fee'],['reg','Registration Fee'],['idcard','ID Card Charges'],['book','Book Charges'],['fine','Fine'],['hospital','Hospital T. Fee'],['prospectus','Prospectus Fee'],['other','Others']];
+    var heads = [['admission','Admission Fee'],['tuition','Tuition Fee'],['monthly','Monthly Fee'],['exam','Examination Fee'],['reg','Registration Fee'],['idcard','ID Card Charges'],['book','Book Charges'],['fine','Fine'],['hospital','Hospital T. Fee'],['prospectus','Prospectus Fee'],['other','Others']];
+    var payHead = (p && p.head) || (c && c.head) || '';
+    // normalize: map monthly->tuition for display, keep others as-is
+    var placed = false;
     for(var i=0;i<heads.length;i++){
-      var amt = (c && c.head===heads[i][0]) ? p.amount : '';
+      var match = payHead===heads[i][0] || (payHead==='monthly'&&heads[i][0]==='tuition');
+      var amt = (match && !placed) ? p.amount : '';
+      if(match) placed = true;
       rows += '<tr><td>'+heads[i][1]+'</td><td style="text-align:right">'+(amt?fmt(amt):'')+'</td></tr>';
+    }
+    // if head didn't match any row, put amount in Others
+    if(!placed){
+      rows = rows.replace('<tr><td>Others</td><td style="text-align:right"></td></tr>',
+        '<tr><td>Others</td><td style="text-align:right">'+fmt(p.amount)+'</td></tr>');
     }
     return '<div class="receipt-book">'
     +'<div class="rc-head"><img src="'+LOGO_SVG+'" class="rc-logo">'
