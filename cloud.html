@@ -981,7 +981,7 @@ async function vStudents(q){
   var rows='';
   for(var i=0;i<students.length;i++){
     var s=students[i];
-    if(q && (s.name+' '+s.cnic+' '+(s.phone||'')).toLowerCase().indexOf(q)<0) continue;
+    if(q && (s.name+' '+s.cnic+' '+(s.phone||'')).toLowerCase().indexOf(q)<0 && !(q.replace(/\D/g,'').length>=3 && String(s.cnic||'').replace(/\D/g,'').indexOf(q.replace(/\D/g,''))>=0)) continue;
     if(_stuFilter.prog && s.program!==_stuFilter.prog) continue;
     var d = dm[s.cnic]||0;
     rows += '<tr><td>'+esc(s.roll||'-')+'</td><td>'+photoHTML(s,'ph-sm')+'<a href="#/student/'+esc(s.cnic)+'">'+esc(s.name)+'</a></td><td dir="ltr">'+esc(s.cnic)+'</td><td dir="ltr">'+esc(s.phone||'-')+'</td><td>'+esc(progName(s.program))+'</td>'
@@ -1953,7 +1953,7 @@ async function quickSearch(){
     var q = inp.value.trim().toLowerCase(), out = '';
     if(q.length<2){ document.getElementById('qsRes').innerHTML=''; return; }
     var hits = students.filter(function(s){
-      return (s.name||'').toLowerCase().indexOf(q)>=0 || (s.cnic||'').indexOf(q)>=0 || String(s.roll||'').indexOf(q)>=0;
+      return (s.name||'').toLowerCase().indexOf(q)>=0 || ((s.cnic||'').indexOf(q)>=0 || (q.replace(/\D/g,'').length>=3 && String(s.cnic||'').replace(/\D/g,'').indexOf(q.replace(/\D/g,''))>=0)) || String(s.roll||'').indexOf(q)>=0;
     }).slice(0,8);
     for(var i=0;i<hits.length;i++){
       var s = hits[i], d = dm[s.cnic]||0;
@@ -2678,7 +2678,7 @@ async function qcSearch(){
   if(q.length<2){ document.getElementById('qcResults').innerHTML=''; document.getElementById('qcDues').innerHTML=''; return; }
   await warmStuCache();
   var all = await DB.all('students');
-  var m = all.filter(function(s){ return s.status==='active' && (s.name.toLowerCase().indexOf(q)>=0 || s.cnic.indexOf(q)>=0 || (s.phone||'').indexOf(q)>=0); }).slice(0,8);
+  var m = all.filter(function(s){ return s.status==='active' && (s.name.toLowerCase().indexOf(q)>=0 || (s.cnic.indexOf(q)>=0 || (q.replace(/\D/g,'').length>=3 && String(s.cnic||'').replace(/\D/g,'').indexOf(q.replace(/\D/g,''))>=0)) || (s.phone||'').indexOf(q)>=0); }).slice(0,8);
   document.getElementById('qcResults').innerHTML = m.map(function(s){
     return '<button class="btn gh sm" style="margin:4px" onclick="qcPick(\''+s.cnic+'\')">'+esc(s.name)+' <span dir="ltr">'+esc(s.cnic)+'</span></button>';
   }).join('') || '<p class="mut">'+t('s_nor')+'</p>';
