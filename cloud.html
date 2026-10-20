@@ -593,7 +593,7 @@ function vLogin(){
   return '<div class="loginwrap"><div class="logincard"><img src="'+LOGO+'" style="width:84px;height:84px;object-fit:contain;margin-bottom:6px" alt="logo"><h1>Khalil Institute</h1><p>'+t('app_sub')+'</p>'
   +'<div class="err" id="lgErr"></div>'
   +'<form onsubmit="return doLogin(event)">'
-  +'<div class="frow" style="text-align:left"><label>'+t('login_cnic')+'</label><input id="lgCnic" inputmode="numeric" dir="ltr" placeholder="35202-1234567-1" maxlength="15" oninput="fmtCnic(this)" autofocus autocomplete="username"></div>'
+  +'<div class="frow" style="text-align:left"><label>'+t('login_cnic')+'</label><input id="lgCnic" inputmode="numeric" dir="ltr" placeholder="3520212345671" maxlength="15" autofocus autocomplete="username"></div>'
   +'<div class="frow" style="text-align:left"><label>'+t('login_pass')+'</label>'+pwField('lgPass')+'</div>'
   +'<button class="btn" type="submit" id="lgBtn" style="width:100%">'+t('login_btn')+'</button></form>'
   +'<div style="margin-top:10px"><a href="javascript:showForgotPw()" style="font-size:13px">'+t('login_forgot')+'</a></div>'
@@ -719,7 +719,7 @@ async function doFirstLogin(){
 function showForgotPw(){
   document.getElementById('forgotBox').innerHTML = '<div class="card" style="margin-top:12px"><h3>'+t('fp_title')+'</h3>'
   +'<div class="err" id="fpErr"></div>'
-  +'<div class="frow"><label>'+t('login_cnic')+'</label><input id="fp_cnic" inputmode="numeric" dir="ltr" maxlength="15" oninput="fmtCnic(this)"></div>'
+  +'<div class="frow"><label>'+t('login_cnic')+'</label><input id="fp_cnic" inputmode="numeric" dir="ltr" maxlength="15"></div>'
   +'<button class="btn sm" onclick="fpStep1()">'+t('fp_next')+'</button><div id="fpStep2"></div></div>';
 }
 async function fpStep1(){
