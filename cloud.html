@@ -1496,7 +1496,7 @@ async function printRollSlips(examId){
   await warmStuCache();
   var L = LANG==='ur';
   var cards = es.map(function(x){
-    var s = STUCACHE[x.cnic]||{};
+    var s = _stuCache[x.cnic]||{};
     return '<div class="doc" style="page-break-after:always"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc('Khalil Institute')+'</h1><div>'+(L?'رول نمبر سلپ':'Roll No Slip')+'</div></div><div class="dh"></div>'
     +'<table><tr><th>'+(L?'امتحان':'Exam')+'</th><td>'+esc(e.name)+'</td><th>'+(L?'رول نمبر':'Roll No')+'</th><td><b>'+esc(x.roll)+'</b></td></tr>'
     +'<tr><th>'+(L?'نام':'Name')+'</th><td>'+esc(s.name||x.cnic)+'</td><th>'+(L?'والد کا نام':'Father')+'</th><td>'+esc(s.father||'')+'</td></tr>'
@@ -1518,7 +1518,7 @@ async function printDMC(examId){
   mk.forEach(function(m){ mlookup[m.cnic+'|'+m.sid]=m.obt; });
   var L = LANG==='ur';
   var cards = es.map(function(x){
-    var s = STUCACHE[x.cnic]||{};
+    var s = _stuCache[x.cnic]||{};
     var tot=0;
     var srows = e.subjects.map(function(sb){
       var v=mlookup[x.cnic+'|'+sb.sid]; v=(v===undefined?0:v); tot+=v;
