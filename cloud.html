@@ -326,11 +326,19 @@ var DB = {
       if(rows.length < 1000) break;
       off += 1000;
     }
-    if(out.length) DB._cset(t, out);
+    DB._cset(t, out);
     return out;
   },
   get: async function(n,k){
     if(k===undefined||k===null||k==='') return null;
+    var chit = DB._cget(DB.T(n));
+    if(chit){
+      var cf;
+      if(DB.KEYED[n]) cf = chit.find(function(r){ return String(r.cnic)===String(k); });
+      else if(n==='settings') cf = chit.find(function(r){ return String(r.k)===String(k); });
+      else cf = chit.find(function(r){ return String(r.id)===String(k); });
+      return cf || null;
+    }
     var q;
     if(DB.KEYED[n]) q = '/rest/v1/'+DB.T(n)+'?key=eq.'+encodeURIComponent(k)+'&select=data&limit=1';
     else if(n==='settings') q = '/rest/v1/'+DB.T(n)+'?data->>k=eq.'+encodeURIComponent(k)+'&select=data&limit=1';
@@ -378,6 +386,8 @@ var DB = {
   },
   byIndex: async function(n,idx,val){
     var f = DB.IDX[idx]||'cnic';
+    var bhit = DB._cget(DB.T(n));
+    if(bhit) return bhit.filter(function(r){ return String(r[f])===String(val); });
     var sel = DB.KEYED[n] ? 'key,data' : 'id,data';
     var rows = await DB.req('GET', '/rest/v1/'+DB.T(n)+'?data->>'+f+'=eq.'+encodeURIComponent(val)+'&select='+sel);
     return (rows||[]).map(DB.withId);
@@ -1168,13 +1178,11 @@ async function vStudentProfile(cnic){
     chRows+='<tr><td>'+esc(c.no)+'</td><td>'+esc(c.title)+'</td><td style="text-align:right">'+fmt(c.amount)+'</td><td style="text-align:right">'+fmt(c.paid)+'</td><td style="text-align:right;font-weight:700;color:'+(bal>0?'var(--red)':'var(--g)')+'">'+fmt(bal)+'</td><td>'+statusBadge(c.status)+'</td><td><button class="btn sm" onclick="printChallan('+c.id+')">'+t('fee_print')+'</button></td></tr>';
   }
   var remaining = totalFees + fineCharged - paid;
-  // attendance last 30 days
+  // attendance last 30 days (single pull, filtered in memory)
   var p=0, a=0, d0=new Date(); d0.setDate(d0.getDate()-30);
-  for(var dd=new Date(d0); dd<=new Date(); dd.setDate(dd.getDate()+1)){
-    var ds=dd.toISOString().slice(0,10);
-    var recs=await DB.byIndex('attendance','byDate',ds);
-    for(var k=0;k<recs.length;k++) if(recs[k].kind==='stu'&&recs[k].ref===cnic){ if(recs[k].status==='P')p++; else a++; }
-  }
+  var d0s = d0.toISOString().slice(0,10), tds = today();
+  var attAll = await DB.all('attendance');
+  for(var k=0;k<attAll.length;k++){ var ar=attAll[k]; if(ar.kind==='stu'&&ar.ref===cnic&&ar.date>=d0s&&ar.date<=tds){ if(ar.status==='P')p++; else a++; } }
   function kv(lb,v){ return '<tr><td style="width:40%;color:var(--mut)">'+lb+'</td><td style="font-weight:600">'+(v==null||v==='' ? '-' : esc(String(v)))+'</td></tr>'; }
   var gName = s.gender==='M'?t('f_male'):t('f_female');
   var html = '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_stu'),'#/students'],[s.name,null]])
@@ -1205,16 +1213,16 @@ async function vStudentProfile(cnic){
     +'</table></div>'
       +'<div class="card"><h2>'+t('p_payhist')+'</h2>'+adminOnly('<div class="row" style="margin-bottom:8px"><a class="btn sm gold" href="#/fees/new/'+esc(s.cnic)+'">'+t('fee_new')+'</a></div>')
     +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th style="text-align:right">'+t('fee_paid')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th><th>'+t('fee_status')+'</th><th>'+t('cmn_actions')+'</th></tr>'
-    +(chRows||'<tr><td colspan="7" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'+await vPayLedger(s.cnic)
+    +(chRows||'<tr><td colspan="7" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'+await vPayLedger(s.cnic, ch)
   +'<div class="card"><h2>'+t('p_attsum')+' <span class="mut" style="font-size:.7em">(30 '+t('f_days')+')</span></h2><table class="tbl">'
     +kv(t('p_present'),p)+kv(t('p_absent'),a)
     +'</table></div>';
   return html;
 }
 
-async function vPayLedger(cnic){
+async function vPayLedger(cnic, chPre){
   var pays = await DB.byIndex('payments','byStudent',cnic);
-  var challans = await DB.byIndex('challans','byStudent',cnic);
+  var challans = chPre || await DB.byIndex('challans','byStudent',cnic);
   var chMap = {};
   for(var i=0;i<challans.length;i++) chMap[challans[i].id] = challans[i];
   pays.sort(function(a,b){
@@ -1566,60 +1574,41 @@ async function printStudentSummary(cnic){
   var fee = s.fee||{};
   var fA=+fee.adm||0, fM=+fee.monthly||0, fR=+fee.reg||0, fE=+fee.exam||0, fF=+fee.fine||0, fO=+fee.other||0;
   var monIn = monthsInSession(s.adm);
-  var monTot = fM*monIn;
-  var totalFees = fA+monTot+fR+fE+fF+fO;
   var ch = await DB.byIndex('challans','byStudent',cnic);
   var paid=0, fineCharged=0;
   for(var i=0;i<ch.length;i++){ paid+=Number(ch[i].paid)||0; if(ch[i].kind==='fine') fineCharged+=Number(ch[i].amount)||0; }
-  var remaining = totalFees + fineCharged - paid;
-  var exams = await DB.all('exams');
-  var mine = [];
-  for(var ei=0;ei<exams.length;ei++){
-    var esx = await DB.byIndex('examstu','byExam',exams[ei].id);
-    for(var j=0;j<esx.length;j++) if(esx[j].cnic===cnic){ mine.push(exams[ei]); break; }
-  }
-  mine.sort(function(a,b){ return (String(a.date||'')<String(b.date||''))?1:-1; });
-  var examHtml = '<h3 class="mt">'+t('sum_exam')+'</h3><p>'+t('sum_noexam')+'</p>';
-  if(mine.length){
-    var e = mine[0];
-    var subs = await DB.all('subjects');
-    function subName(sid){ for(var k=0;k<subs.length;k++) if(subs[k].id===sid) return subs[k].name; return ''; }
-    var es2 = await DB.byIndex('examstu','byExam',e.id);
-    var mk = await DB.byIndex('marks','byExam',e.id);
-    var mlookup = {};
-    mk.forEach(function(m){ mlookup[m.cnic+'|'+m.sid]=m.obt; });
-    var totalMax = e.subjects.reduce(function(a,x){return a+x.marks;},0);
-    var myTot = 0;
-    var srows = e.subjects.map(function(sb){
-      var v = mlookup[cnic+'|'+sb.sid]; v=(v===undefined?0:v); myTot+=v;
-      return '<tr><td>'+esc(subName(sb.sid))+'</td><td style="text-align:right">'+sb.marks+'</td><td style="text-align:right">'+v+'</td></tr>';
-    }).join('');
-    var tots = es2.map(function(x){ var t2=0; e.subjects.forEach(function(sb){ var v=mlookup[x.cnic+'|'+sb.sid]; t2+=(v===undefined?0:v); }); return t2; }).sort(function(a,b){return b-a;});
-    var pos = tots.indexOf(myTot)+1;
-    var pct = totalMax? Math.round(myTot/totalMax*100):0;
-    examHtml = '<h3 class="mt">'+t('sum_exam')+': '+esc(e.name)+'</h3>'
-      +'<table><tr><th>'+(L?'تاریخ':'Date')+'</th><td dir="ltr">'+esc(e.date||'')+'</td><th>'+(L?'پوزیشن':'Position')+'</th><td>'+pos+' / '+es2.length+'</td></tr></table>'
-      +'<table class="mt"><tr><th>'+(L?'مضمون':'Subject')+'</th><th style="text-align:right">'+(L?'کل نمبر':'Total')+'</th><th style="text-align:right">'+(L?'حاصل کردہ':'Obtained')+'</th></tr>'+srows
-      +'<tr><th>'+(L?'کل':'Grand Total')+'</th><th style="text-align:right">'+totalMax+'</th><th style="text-align:right"><b>'+myTot+'</b> ('+pct+'%)</th></tr></table>';
-  }
+  // monthly-fee money received: find the monthly head (the recurring fee head, else the head titled Monthly)
+  var monHeadId = null, byHead = {};
+  for(var hi=0;hi<ch.length;hi++){ if(ch[hi].kind==='fee' && ch[hi].month){ byHead[ch[hi].headId] = byHead[ch[hi].headId]||{}; byHead[ch[hi].headId][ch[hi].month]=1; } }
+  for(var hk in byHead){ if(Object.keys(byHead[hk]).length>=2){ monHeadId = Number(hk); break; } }
+  if(monHeadId===null){ try{ var heads = await DB.all('feeHeads'); for(var hj=0;hj<heads.length;hj++){ if(heads[hj].program===s.program && /month/i.test(heads[hj].title||'')){ monHeadId = heads[hj].id; break; } } }catch(e){} }
+  var monPaid = 0;
+  if(monHeadId!==null){ for(var mi=0;mi<ch.length;mi++) if(ch[mi].headId===monHeadId) monPaid += Number(ch[mi].paid)||0; }
+  var monthsPaid = fM>0 ? monPaid/fM : 0;
+  var monthsPaidTxt = String(Math.round(monthsPaid*10)/10);
+  function durMonths(d){ if(!d) return 0; var m1=String(d).match(/(\d+(?:\.\d+)?)\s*year/i); if(m1) return Math.round(parseFloat(m1[1])*12); var m2=String(d).match(/(\d+(?:\.\d+)?)\s*month/i); if(m2) return Math.round(parseFloat(m2[1])); var m3=String(d).match(/(\d+(?:\.\d+)?)\s*semester/i); if(m3) return Math.round(parseFloat(m3[1])*6); return 0; }
+  var progMonths = durMonths(s.duration) || monIn;
+  var yearNum = Math.max(1, Math.ceil(monIn/12));
+  var yearEndMonths = Math.min(progMonths, yearNum*12);
+  var dueThisYear = fA + fR + fE + fM*yearEndMonths + fF + fO;
+  var progTotal = fA + fR + fE + fM*progMonths + fF + fO;
+  var remYear = Math.max(0, dueThisYear + fineCharged - paid);
+  var remProg = Math.max(0, progTotal + fineCharged - paid);
+  var sesName = s.session||'';
+  try{ var sess = await DB.all('sessions'); for(var si=0;si<sess.length;si++) if(String(sess[si].id)===String(s.session)) sesName = sess[si].name; }catch(e){}
   function frow(lb,v){ return '<tr><th>'+lb+'</th><td style="text-align:right">'+v+'</td></tr>'; }
-  var feeRows = frow(L?'داخلہ فیس':'Admission Fee', fmt(fA))
-    + frow((L?'ماہانہ فیس':'Monthly Fee')+' ('+fmt(fM)+' x '+monIn+' '+(L?'مہینے':'months')+')', fmt(monTot))
-    + frow(L?'رجسٹریشن فیس':'Registration Fee', fmt(fR))
-    + frow(L?'امتحانی فیس':'Exam Fee', fmt(fE))
-    + (fF?frow(L?'جرمانہ':'Fine', fmt(fF)):'')
-    + (fO?frow(L?'دیگر':'Other', fmt(fO)):'')
-    + '<tr><th>'+(L?'کل فیس':'Total Fees')+'</th><td style="text-align:right"><b>'+fmt(totalFees)+'</b></td></tr>'
-    + frow(L?'ادا شدہ':'Total Paid', fmt(paid))
-    + '<tr><th>'+(L?'بقایا':'Remaining')+'</th><td style="text-align:right"><b>'+fmt(remaining)+'</b></td></tr>';
-  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc('Khalil Institute')+'</h1><div>'+t('sum_title')+'</div></div><div class="dh"></div>'
+  var feeRows = frow((L?'ماہانہ فیس':'Monthly Fee'), fmt(fM)+' / '+(L?'مہینہ':'month'))
+    + frow((L?'ادا شدہ ماہانہ فیس':'Monthly Fee Paid')+' ('+monthsPaidTxt+' '+(L?'مہینے':'months')+')', fmt(monPaid))
+    + frow(L?'کل ادا شدہ رقم':'Total Paid (All Fees)', fmt(paid))
+    + '<tr><th>'+(L?'رواں سال کا بقایا':'Remaining - Current Year')+' ('+(L?'سال':'Year')+' '+yearNum+')</th><td style="text-align:right"><b>'+fmt(remYear)+'</b></td></tr>'
+    + '<tr><th>'+(L?'پورے پروگرام کا بقایا':'Remaining - Whole Programme')+'</th><td style="text-align:right"><b>'+fmt(remProg)+'</b></td></tr>'
+    + frow(L?'پورے پروگرام کی کل فیس':'Total Programme Fee', fmt(progTotal + fineCharged));
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+(L?'فیس خلاصہ — والدین کی کاپی':'Fee Summary — Parent Copy')+'</div></div><div class="dh"></div>'
     +'<table><tr><th>'+(L?'نام':'Name')+'</th><td>'+esc(s.name||'')+'</td><th>'+(L?'رول نمبر':'Roll No')+'</th><td>'+esc(s.roll||'-')+'</td></tr>'
     +'<tr><th>'+(L?'والد کا نام':'Father')+'</th><td>'+esc(s.father||'')+'</td><th>'+(L?'شناختی کارڈ':'CNIC')+'</th><td dir="ltr">'+esc(s.cnic)+'</td></tr>'
-    +'<tr><th>'+(L?'پروگرام':'Program')+'</th><td>'+esc(progName(s.program))+'</td><th>'+(L?'سیشن':'Session')+'</th><td>'+esc(s.session||'')+'</td></tr>'
-    +'<tr><th>'+(L?'Admتاریخ':'Admission Date')+'</th><td dir="ltr">'+esc(s.adm||'')+'</td><th>'+t('p_timein')+'</th><td>'+durTxt(monIn)+' ('+monIn+' '+(monIn===1?t('p_month'):t('p_months'))+')</td></tr>'
-    +'<tr><th>'+(L?'موبائل':'Mobile')+'</th><td dir="ltr">'+esc(s.phone||'')+'</td><th>'+(L?'حیثیت':'Status')+'</th><td>'+esc(s.status||'')+'</td></tr></table>'
-    +'<h3 class="mt">'+(L?'فیس کی تفصیل':'Fee Details')+'</h3><table>'+feeRows+'</table>'
-    + examHtml
+    +'<tr><th>'+(L?'پروگرام':'Program')+'</th><td>'+esc(progName(s.program))+'</td><th>'+(L?'سیشن':'Session')+'</th><td>'+esc(sesName)+'</td></tr>'
+    +'<tr><th>'+(L?'داخلے کی تاریخ':'Admission Date')+'</th><td dir="ltr">'+esc(s.adm||'')+'</td><th>'+t('p_timein')+'</th><td>'+durTxt(monIn)+' ('+monIn+' '+(monIn===1?t('p_month'):t('p_months'))+')</td></tr></table>'
+    +'<h3 class="mt">'+(L?'فیس کا خلاصہ':'Fee Summary')+'</h3><table>'+feeRows+'</table>'
     +'<p class="mt"><b>'+(L?'تاریخ':'Date')+':</b> <span dir="ltr">'+today()+'</span></p>'
     +'<div style="margin-top:60px;display:flex;justify-content:space-between"><span>___________<br>'+(L?'دستخط':'Signature')+'</span><span>___________<br>'+(L?'مہر':'Stamp')+'</span></div></div>';
   window.print();
