@@ -1580,7 +1580,7 @@ async function printStudentSummary(cnic){
   // monthly-fee money received: find the monthly head (the recurring fee head, else the head titled Monthly)
   var monHeadId = null, byHead = {};
   for(var hi=0;hi<ch.length;hi++){ if(ch[hi].kind==='fee' && ch[hi].month){ byHead[ch[hi].headId] = byHead[ch[hi].headId]||{}; byHead[ch[hi].headId][ch[hi].month]=1; } }
-  for(var hk in byHead){ if(Object.keys(byHead[hk]).length>=2){ monHeadId = Number(hk); break; } }
+  var bestCount = 1; for(var hk in byHead){ var hcnt = Object.keys(byHead[hk]).length; if(hcnt>bestCount){ bestCount = hcnt; monHeadId = Number(hk); } }
   if(monHeadId===null){ try{ var heads = await DB.all('feeHeads'); for(var hj=0;hj<heads.length;hj++){ if(heads[hj].program===s.program && /month/i.test(heads[hj].title||'')){ monHeadId = heads[hj].id; break; } } }catch(e){} }
   var monPaid = 0;
   if(monHeadId!==null){ for(var mi=0;mi<ch.length;mi++) if(ch[mi].headId===monHeadId) monPaid += Number(ch[mi].paid)||0; }
