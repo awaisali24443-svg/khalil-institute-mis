@@ -419,7 +419,7 @@ async function vDash(){
   +'<div class="stat"><div class="n">'+fmt(coll)+'</div><div class="l">'+t('d_coll')+' ('+t('cmn_rs')+')</div></div>'
   +'<div class="stat"><div class="n">'+fmt(dues)+'</div><div class="l">'+t('d_dues')+' ('+t('cmn_rs')+')</div></div>'
   +'<div class="stat"><div class="n">'+challans.filter(function(c){return (Number(c.amount)-Number(c.paid))>0;}).length+'</div><div class="l">'+t('fee_challans')+' ('+t('fee_unpaid')+')</div></div></div>'
-  +'<div class="card"><div class="between"><h2>'+t('d_recent')+'</h2><div class="row"><a class="btn sm" href="#/studentform/new">'+t('d_add')+'</a><a class="btn sm gold" href="#/fees">'+t('d_challan')+'</a></div></div>'
+  +'<div class="card"><div class="between"><h2>'+t('d_recent')+'</h2><div class="row"><a class="btn sm gold" href="#/fees">'+t('d_challan')+'</a></div></div>'
   +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th>'+t('fee_method')+'</th></tr>'
   +(recent||'<tr><td colspan="5" class="mut">'+t('d_none')+'</td></tr>')+'</table></div></div>';
 }
@@ -1273,7 +1273,7 @@ async function vAttendance(sub){
     var st = _attBuf[x.cnic]||'P';
     var nmCell = kind==='stu' ? stuLink(x.cnic, x.name) : esc(x.name);
     return '<tr><td>'+nmCell+'</td><td dir="ltr">'+esc(x.cnic)+'</td><td><div class="row" style="gap:4px">'
-    +['P','A','L'].map(function(s2){ return '<button class="btn sm '+(st===s2?'':'gh')+'" id="ab_'+x.cnic+'" onclick="attSet(\''+x.cnic+'\',\''+s2+'\')">'+t('at_'+s2.toLowerCase())+'</button>'; }).join('')
+    +['P','A','L'].map(function(s2){ return '<button class="btn sm '+(st===s2?'':'gh')+'" data-ab="'+x.cnic+'" onclick="attSet(\''+x.cnic+'\',\''+s2+'\')">'+t('at_'+s2.toLowerCase())+'</button>'; }).join('')
     +'</div></td></tr>';
   }).join('');
   return '<div class="card"><h2>'+t('at_title')+'</h2>'+tabs
@@ -1285,7 +1285,7 @@ async function vAttendance(sub){
 }
 function attSet(cnic, st){
   _attBuf[cnic]=st;
-  var btns = document.querySelectorAll('[id="ab_'+cnic+'"]');
+  var btns = document.querySelectorAll('[data-ab="'+cnic+'"]');
   var keys = ['P','A','L'];
   for(var i=0;i<btns.length && i<3;i++) btns[i].className = 'btn sm '+(keys[i]===st?'':'gh');
 }
@@ -1320,8 +1320,8 @@ async function attSummary(kind){
 
 /* ---------- attendance: mark all present ---------- */
 function attAllPresent(){
-  var btns = document.querySelectorAll('[id^="ab_"]'), seen={};
-  for(var i=0;i<btns.length;i++){ var id=btns[i].id.slice(3); if(!seen[id]){ seen[id]=1; attSet(id,'P'); } }
+  var btns = document.querySelectorAll('[data-ab]'), seen={};
+  for(var i=0;i<btns.length;i++){ var id=btns[i].getAttribute('data-ab'); if(!seen[id]){ seen[id]=1; attSet(id,'P'); } }
   toast(t('at_allp'));
 }
 
