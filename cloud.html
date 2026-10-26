@@ -661,7 +661,8 @@ async function checkFirstLogin(u){
       var s = await DB.get('students', u.cnic);
       if(s && !s.pwChanged) return true;
     } else if(u.role!=='student'){
-      var ok = await setting('pwok_'+u.id,'');
+      if(u.role==='admin') return false;
+      var ok = await setting('pwok_'+(u.uid||u.id),'');
       if(!ok) return true;
     }
   }catch(e){}
@@ -691,8 +692,9 @@ async function doFirstLogin(){
   var u = _curUser;
   try{
     // Update auth password
+    try{ await refreshSession(); }catch(e){}
     var r = await fetch(SB.url+'/auth/v1/user', {method:'PUT',
-      headers:{'apikey':SB.anon,'Authorization':'Bearer '+SB.token,'Content-Type':'application/json'},
+      headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||''),'Content-Type':'application/json'},
       body: JSON.stringify({password:p1})});
     if(!r.ok) throw new Error('pw_fail');
     // Mark pwChanged + save security question for students
@@ -706,7 +708,7 @@ async function doFirstLogin(){
       }
       location.hash = '#/student/'+u.cnic;
     } else {
-      await setSetting('pwok_'+u.id,'1');
+      await setSetting('pwok_'+(u.uid||u.id),'1');
       location.hash = '#/dash';
     }
     toast(t('pw_done'));
@@ -767,7 +769,7 @@ function showPwNudge(){
 
 async function pwNudgeLater(){
   var d = document.getElementById('pwNudge'); if(d) d.remove();
-  try{ if(_curUser) await setSetting('pwok_'+_curUser.id,'1'); }catch(e){}
+  try{ if(_curUser) await setSetting('pwok_'+(_curUser.uid||_curUser.id),'1'); }catch(e){}
 }
 /* ===== src/auth/setup-wizard.cloud.js — first-time client setup wizard (4 steps) (cloud variant) ===== */
 /* ---------- first-time setup wizard (for non-technical clients) ---------- */
@@ -822,14 +824,14 @@ async function suNext(step){
         headers:{'apikey':SB.anon,'Authorization':'Bearer '+SB.token,'Content-Type':'application/json'},
         body: JSON.stringify({password:p1})});
       if(!r.ok) throw new Error();
-      var p = await DB.get('profiles', _curUser.id) || {id:_curUser.id};
+      var p = await DB.get('profiles', (_curUser.uid||_curUser.id)) || {id:(_curUser.uid||_curUser.id)};
       p.pwChanged = true;
       await DB.put('profiles', p);
     }catch(e){ showErr('suErr', t('pw_fail')); return; }
   } else if(step===2){
     var sq = val('su_sq'), sa = val('su_sa').trim();
     if(!sa){ showErr('suErr', t('fp_wrong')); return; }
-    var p2 = await DB.get('profiles', _curUser.id) || {id:_curUser.id};
+    var p2 = await DB.get('profiles', (_curUser.uid||_curUser.id)) || {id:(_curUser.uid||_curUser.id)};
     p2.secQ = sq; p2.secA = btoa(unescape(encodeURIComponent(sa.toLowerCase())));
     await DB.put('profiles', p2);
   } else if(step===3){
@@ -1716,11 +1718,12 @@ async function doPwChange(){
   if(!p1 || p1.length<6){ showErr('pwErr', t('pw_short')); return; }
   if(p1!==p2){ showErr('pwErr', t('pw_mismatch')); return; }
   try{
+    try{ await refreshSession(); }catch(e){}
     var r = await fetch(SB.url+'/auth/v1/user', {method:'PUT',
-      headers:{'apikey':SB.anon,'Authorization':'Bearer '+SB.token,'Content-Type':'application/json'},
+      headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||''),'Content-Type':'application/json'},
       body: JSON.stringify({password:p1})});
     if(!r.ok) throw new Error('failed');
-    try{ if(_curUser) await setSetting('pwok_'+_curUser.id,'1'); }catch(e){}
+    try{ if(_curUser) await setSetting('pwok_'+(_curUser.uid||_curUser.id),'1'); }catch(e){}
     document.getElementById('pwOk').textContent = t('pw_done');
     document.getElementById('pwErr').textContent = '';
   }catch(e){ showErr('pwErr', t('pw_fail')); }
@@ -1877,6 +1880,7 @@ async function saveSettings(){
   var np = val('set_pass');
   if(np){
     if(np.length<6){ alert('Password too short'); return; }
+    try{ await refreshSession(); }catch(e){}
     var pr = await fetch(SB.url+'/auth/v1/user', {method:'PUT',
       headers:{'apikey':SB.anon,'Authorization':'Bearer '+(SB.token||''),'Content-Type':'application/json'},
       body: JSON.stringify({password: np})});
