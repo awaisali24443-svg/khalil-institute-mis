@@ -656,8 +656,10 @@ async function vStudentProfile(cnic){
   for(var k=0;k<attAll.length;k++){ var ar=attAll[k]; if(ar.kind==='stu'&&ar.ref===cnic&&ar.date>=d0s&&ar.date<=tds){ if(ar.status==='P')p++; else a++; } }
   function kv(lb,v){ return '<tr><td style="width:40%;color:var(--mut)">'+lb+'</td><td style="font-weight:600">'+(v==null||v==='' ? '-' : esc(String(v)))+'</td></tr>'; }
   var gName = s.gender==='M'?t('f_male'):t('f_female');
+  var sesName = s.session||'';
+  try{ var _sess = await DB.all('sessions'); for(var _si=0;_si<_sess.length;_si++) if(String(_sess[_si].id)===String(s.session)) sesName = _sess[_si].name; }catch(e){}
   var html = '<div class="card">'+crumbs([[t('nav_dash'),'#/dash'],[t('nav_stu'),'#/students'],[s.name,null]])
-  +'<div class="between"><div style="display:flex;gap:14px;align-items:center">'+photoHTML(s)+'<div><h2 style="margin:0">'+esc(s.name)+'</h2><div class="mut">'+t('f_roll')+': '+esc(s.roll||'-')+' &middot; '+esc(progName(s.program))+' &middot; '+(s.session||'')+'</div></div>'
+  +'<div class="between"><div style="display:flex;gap:14px;align-items:center">'+photoHTML(s)+'<div><h2 style="margin:0">'+esc(s.name)+'</h2><div class="mut">'+t('f_roll')+': '+esc(s.roll||'-')+' &middot; '+esc(progName(s.program))+' &middot; '+esc(sesName)+'</div></div>'
     +'<div class="row"><a class="btn sm" href="#/studentform/'+esc(s.cnic)+'">'+t('p_edit')+'</a><a class="btn sm gold" href="#/collect">'+t('p_collect')+'</a><a class="btn sm red" href="#/fees/fine/'+esc(s.cnic)+'">'+t('fee_add_fine')+'</a><button class="btn sm gold" onclick="printStudentSummary(\''+s.cnic+'\')">'+t('sum_btn')+'</button><button class="btn sm gh" onclick="window.print()">'+t('p_print')+'</button></div></div>'
     +'<div class="mt"><span class="badge b-'+s.status+'">'+t('f_'+s.status)+'</span></div></div></div>'
   +'<div class="row mt" style="gap:6px"><a class="btn sm gh" href="#/attendance/stu">'+t('nav_at')+'</a><a class="btn sm gh" href="#/academics">'+t('nav_acad')+'</a><a class="btn sm gh" href="#/letters/new">'+t('nav_let')+'</a><a class="btn sm gh" href="#/fees">'+t('nav_fee')+'</a></div></div>'
