@@ -1298,7 +1298,7 @@ async function vFees(sub){
   +adminOnly('<div class="card"><h2>'+t('fee_gen_month')+'</h2><div class="f2"><div class="frow"><label>'+t('f_session')+'</label><select id="gm_ses">'+await sesOpts()+'</select></div>'
   +'<div class="frow"><label>'+t('fee_head')+'</label><select id="gm_head">'+heads.map(function(hh){return '<option value="'+hh.id+'">'+esc(progName(hh.program))+' — '+esc(hh.title)+' ('+fmt(hh.amount)+')</option>';}).join('')+'</select></div></div>'
   +'<button class="btn gold" onclick="genMonthly()">'+t('fee_gen_month')+'</button></div>')
-  +'<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2>'+adminOnly('<a class="btn" href="#/fees/new/">'+t('fee_new')+'</a>')+'</div>'
+  +'<div class="card"><div class="between"><h2>'+t('fee_challans')+'</h2><span>'+adminOnly('<a class="btn" href="#/fees/new/">'+t('fee_new')+'</a>')+' <button class="btn gh" onclick="printVouchersBulk()">'+t('fee_printall')+'</button></span></div>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_no')+'</th><th>'+t('s_name')+'</th><th>'+t('fee_head')+'</th><th style="text-align:right">'+t('fee_amt')+'</th><th>'+t('fee_status')+'</th><th>'+t('cmn_actions')+'</th></tr>'
   +(chRows||'<tr><td colspan="6" class="mut">'+t('fee_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('fee_dues')+'</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th style="text-align:right">'+t('fee_total_due')+'</th></tr>'+duesRows+'</table></div></div>';
