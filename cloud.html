@@ -1715,42 +1715,43 @@ async function vReports(){
   + dxCardHTML();
 }
 
-
 /* ---------- data extractor ---------- */
 var DXDEF = {
-  students: { label: ['Students','Students'], cols: [
-    ['name','Name','Name'], ['father','Father','Father'], ['cnic','CNIC','CNIC'], ['phone','Phone','Phone'], ['roll','Roll No','Roll No'],
-    ['program','Programme','Programme'], ['session','Session','Session'], ['adm','Admission','Admission'], ['status','Status','Status'],
-    ['monthly','Monthly Fee','Monthly Fee'], ['paid','Total Paid','Total Paid'], ['due','Total Due','Total Due'] ] },
-  employees: { label: ['Employees','Employees'], cols: [
-    ['name','Name','Name'], ['father','Father','Father'], ['cnic','CNIC','CNIC'], ['phone','Phone','Phone'],
-    ['desig','Designation','Designation'], ['salary','Salary','Salary'], ['joining','Joining','Joining'], ['status','Status','Status'] ] },
-  payments: { label: ['Payments','Payments'], cols: [
-    ['recNo','Receipt No','Receipt No'], ['date','Date','Date'], ['student','Student','Student'], ['cnic','CNIC','CNIC'],
-    ['amount','Amount','Amount'], ['method','Method','Method'] ] },
-  challans: { label: ['Challans','Challans'], cols: [
-    ['no','Challan No','Challan No'], ['sname','Student','Student'], ['cnic','CNIC','CNIC'], ['title','Description','Description'],
-    ['amount','Amount','Amount'], ['paid','Paid','Paid'], ['balance','Balance','Balance'], ['due','Due Date','Due Date'], ['status','Status','Status'], ['month','Month','Month'] ] },
-  expenses: { label: ['Expenses','Expenses'], cols: [
-    ['date','Date','Date'], ['cat','Category','Category'], ['title','Title','Title'], ['amount','Amount','Amount'] ] }
+  students: { label: ['Students','طلبہ'], cols: [
+    ['name','Name','نام'], ['father','Father','والد کا نام'], ['cnic','CNIC','شناختی کارڈ'], ['phone','Phone','فون'], ['roll','Roll No','رول نمبر'],
+    ['program','Programme','پروگرام'], ['session','Session','سیشن'], ['adm','Admission','داخلہ'], ['status','Status','حالت'],
+    ['monthly','Monthly Fee','ماہانہ فیس'], ['paid','Total Paid','کل ادا شدہ'], ['due','Total Due','کل بقایا'] ] },
+  employees: { label: ['Employees','عملہ'], cols: [
+    ['name','Name','نام'], ['father','Father','والد کا نام'], ['cnic','CNIC','شناختی کارڈ'], ['phone','Phone','فون'],
+    ['desig','Designation','عہدہ'], ['salary','Salary','تنخواہ'], ['joining','Joining','شمولیت'], ['status','Status','حالت'] ] },
+  payments: { label: ['Payments','ادائیگیاں'], cols: [
+    ['recNo','Receipt No','رسید نمبر'], ['date','Date','تاریخ'], ['student','Student','طالب علم'], ['cnic','CNIC','شناختی کارڈ'],
+    ['amount','Amount','رقم'], ['method','Method','طریقہ'] ] },
+  challans: { label: ['Challans','چالان'], cols: [
+    ['no','Challan No','چالان نمبر'], ['sname','Student','طالب علم'], ['cnic','CNIC','شناختی کارڈ'], ['title','Description','تفصیل'],
+    ['amount','Amount','رقم'], ['paid','Paid','ادا شدہ'], ['balance','Balance','بقایا'], ['due','Due Date','آخری تاریخ'], ['status','Status','حالت'], ['month','Month','مہینہ'] ] },
+  expenses: { label: ['Expenses','اخراجات'], cols: [
+    ['date','Date','تاریخ'], ['cat','Category','زمرہ'], ['title','Title','عنوان'], ['amount','Amount','رقم'] ] }
 };
 function dxColsHTML(ds){
-  var def = DXDEF[ds];
-  return def.cols.map(function(c){ return '<label style="display:inline-flex;gap:5px;align-items:center"><input type="checkbox" class="dx_col" value="'+c[0]+'" checked style="width:17px;height:17px"> '+c[1]+'</label>'; }).join('');
+  var L = LANG==='ur'; var def = DXDEF[ds];
+  return def.cols.map(function(c){ return '<label style="display:inline-flex;gap:5px;align-items:center"><input type="checkbox" class="dx_col" value="'+c[0]+'" checked style="width:17px;height:17px"> '+(L?c[2]:c[1])+'</label>'; }).join('');
 }
 function dxFilterHTML(ds){
-  if(ds==='students') return '<div class="f2"><div class="frow"><label>Programme</label><select id="dx_fprog"><option value="">All</option>'+PROGRAMS.map(function(p){ return '<option value="'+p.k+'">'+esc(progName(p.k))+'</option>'; }).join('')+'</select></div>'
-    +'<div class="frow"><label>Status</label><select id="dx_fstatus"><option value="">All</option><option value="active">Active</option><option value="left">Left</option><option value="done">Completed</option></select></div></div>';
-  if(ds==='employees') return '<div class="frow" style="max-width:220px"><label>Status</label><select id="dx_fstatus"><option value="">All</option><option value="active">Active</option><option value="left">Left</option></select></div>';
-  return '<div class="frow" style="max-width:220px"><label>Month</label><input type="month" id="dx_fmonth"></div>';
+  var L = LANG==='ur';
+  if(ds==='students') return '<div class="f2"><div class="frow"><label>'+(L?'پروگرام':'Programme')+'</label><select id="dx_fprog"><option value="">'+(L?'تمام':'All')+'</option>'+PROGRAMS.map(function(p){ return '<option value="'+p.k+'">'+esc(progName(p.k))+'</option>'; }).join('')+'</select></div>'
+    +'<div class="frow"><label>'+(L?'حالت':'Status')+'</label><select id="dx_fstatus"><option value="">'+(L?'تمام':'All')+'</option><option value="active">'+(L?'فعال':'Active')+'</option><option value="left">'+(L?'چھوڑ گیا':'Left')+'</option><option value="done">'+(L?'مکمل':'Completed')+'</option></select></div></div>';
+  if(ds==='employees') return '<div class="frow" style="max-width:220px"><label>'+(L?'حالت':'Status')+'</label><select id="dx_fstatus"><option value="">'+(L?'تمام':'All')+'</option><option value="active">'+(L?'فعال':'Active')+'</option><option value="left">'+(L?'چھوڑ گیا':'Left')+'</option></select></div>';
+  return '<div class="frow" style="max-width:220px"><label>'+(L?'مہینہ':'Month')+'</label><input type="month" id="dx_fmonth"></div>';
 }
 function dxCardHTML(){
-  var opts = Object.keys(DXDEF).map(function(k){ return '<option value="'+k+'">'+DXDEF[k].label[0]+'</option>'; }).join('');
-  return '<div class="card"><h2>Data Extractor</h2>'
-  +'<div class="frow" style="max-width:260px"><label>Dataset</label><select id="dx_ds" onchange="dxCols()">'+opts+'</select></div>'
+  var L = LANG==='ur';
+  var opts = Object.keys(DXDEF).map(function(k){ return '<option value="'+k+'">'+(L?DXDEF[k].label[1]:DXDEF[k].label[0])+'</option>'; }).join('');
+  return '<div class="card"><h2>'+(L?'ڈیٹا ایکسٹریکٹر':'Data Extractor')+'</h2>'
+  +'<div class="frow" style="max-width:260px"><label>'+(L?'ڈیٹاسیٹ':'Dataset')+'</label><select id="dx_ds" onchange="dxCols()">'+opts+'</select></div>'
   +'<div id="dx_filterWrap" class="mt">'+dxFilterHTML('students')+'</div>'
-  +'<div class="frow mt"><label>Columns</label><div id="dx_cols" class="row" style="flex-wrap:wrap;gap:10px">'+dxColsHTML('students')+'</div></div>'
-  +'<p class="mt"><button class="btn gold" onclick="dxRun()">Show Report</button> <button class="btn gh" onclick="dxPrint()">'+t('cmn_print')+'</button></p>'
+  +'<div class="frow mt"><label>'+(L?'کالم':'Columns')+'</label><div id="dx_cols" class="row" style="flex-wrap:wrap;gap:10px">'+dxColsHTML('students')+'</div></div>'
+  +'<p class="mt"><button class="btn gold" onclick="dxRun()">'+(L?'رپورٹ دکھائیں':'Show Report')+'</button> <button class="btn gh" onclick="dxPrint()">'+t('cmn_print')+'</button></p>'
   +'<div id="dx_out" class="mt"></div></div>';
 }
 function dxCols(){
@@ -1794,24 +1795,24 @@ async function dxRows(ds){
   return ex.filter(function(e){ return !mf3||ym(e.date)===mf3; }).map(function(e){ return { date:e.date, cat:expCatName(e.cat), title:e.title, amount:Number(e.amount)||0 }; });
 }
 function dxTableHTML(ds, cols, rows){
-  var def = DXDEF[ds];
-  var head = '<tr>'+cols.map(function(c){ var cd = def.cols.find(function(x){return x[0]===c;}); return '<th>'+(cd?cd[1]:c)+'</th>'; }).join('')+'</tr>';
+  var L = LANG==='ur'; var def = DXDEF[ds];
+  var head = '<tr>'+cols.map(function(c){ var cd = def.cols.find(function(x){return x[0]===c;}); return '<th>'+(cd?(L?cd[2]:cd[1]):c)+'</th>'; }).join('')+'</tr>';
   var body = rows.map(function(r){ return '<tr>'+cols.map(function(c){ var v = r[c]; return '<td>'+(v==null||v===''?'':(typeof v==='number'?fmt(v):esc(String(v))))+'</td>'; }).join('')+'</tr>'; }).join('');
-  return '<table class="tbl">'+head+(body||'<tr><td class="mut">No records</td></tr>')+'</table>';
+  return '<table class="tbl">'+head+(body||'<tr><td class="mut">'+(L?'کوئی ریکارڈ نہیں':'No records')+'</td></tr>')+'</table>';
 }
 async function dxRun(){
   var ds = val('dx_ds') || 'students';
   var cols = Array.prototype.slice.call(document.querySelectorAll('.dx_col')).filter(function(x){return x.checked;}).map(function(x){return x.value;});
   if(!cols.length){ toast(t('f_bad')); return; }
   var rows = await dxRows(ds);
-  document.getElementById('dx_out').innerHTML = '<div style="overflow-x:auto">'+dxTableHTML(ds, cols, rows)+'</div><p class="mut">'+rows.length+' records</p>';
+  document.getElementById('dx_out').innerHTML = '<div style="overflow-x:auto">'+dxTableHTML(ds, cols, rows)+'</div><p class="mut">'+rows.length+' '+(LANG==='ur'?'ریکارڈ':'records')+'</p>';
   window._dxLast = { ds: ds, cols: cols, rows: rows };
 }
 async function dxPrint(){
   var last = window._dxLast; if(!last){ toast(t('f_bad')); return; }
-  var def = DXDEF[last.ds];
+  var L = LANG==='ur'; var def = DXDEF[last.ds];
   var tbl = dxTableHTML(last.ds, last.cols, last.rows).replace('class="tbl"','style="width:100%;border-collapse:collapse"');
-  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+def.label[0]+' Report</div></div><div class="dh"></div>'+tbl+'<p>'+last.rows.length+' records - '+today()+'</p></div>';
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+(L?def.label[1]:def.label[0])+' '+(L?'رپورٹ':'Report')+'</div></div><div class="dh"></div>'+tbl+'<p>'+last.rows.length+' '+(L?'ریکارڈ':'records')+' - '+today()+'</p></div>';
   window.print();
 }
 /* ===== src/pages/audit.cloud.js — audit log page (cloud variant) ===== */
