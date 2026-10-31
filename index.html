@@ -1064,6 +1064,21 @@ async function printVouchersBulk(){
   document.getElementById('printArea').innerHTML = '<div class="doc">' + pages + '</div>';
   window.print();
 }
+
+async function printSalarySlip(expId){
+  var L = LANG==='ur';
+  var x = await DB.get('expenses',expId); if(!x) return;
+  var e = x.empCnic ? await DB.get('employees',x.empCnic) : null;
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+(L?'تنخواہ سلپ':'Salary Slip')+'</div></div><div class="dh"></div>'
+  +'<table><tr><th>'+(L?'ملازم':'Employee')+'</th><td>'+esc((e&&e.name)||x.title||'')+'</td><th>'+(L?'عہدہ':'Designation')+'</th><td>'+esc((e&&e.desig)||'-')+'</td></tr>'
+  +'<tr><th>'+(L?'شناختی کارڈ':'CNIC')+'</th><td dir="ltr">'+esc((e&&e.cnic)||'')+'</td><th>'+(L?'مہینہ':'Month')+'</th><td>'+esc(x.month||ym(x.date))+'</td></tr>'
+  +'<tr><th>'+(L?'والد کا نام':'Father')+'</th><td>'+esc((e&&e.father)||'-')+'</td><th>'+(L?'تاریخ':'Date')+'</th><td dir="ltr">'+esc(x.date||'')+'</td></tr></table>'
+  +'<table><tr><th>'+(L?'تفصیل':'Description')+'</th><th>'+(L?'رقم':'Amount (Rs)')+'</th></tr>'
+  +'<tr><td>'+(L?'ماہانہ تنخواہ':'Monthly Salary')+'</td><td class="amt">'+fmt(x.amount)+'</td></tr>'
+  +'<tr><td><b>'+(L?'کل':'Total')+'</b></td><td class="amt"><b>'+fmt(x.amount)+'</b></td></tr></table>'
+  +'<div class="sig"><div>___________<br>'+(L?'ملازم کے دستخط':'Employee Signature')+'</div><div>___________<br>'+(L?'اکاؤنٹنٹ':'Accountant')+'</div></div></div>';
+  window.print();
+}
 /* ===== src/pages/reports.offline.js — reports page (offline variant) ===== */
 /* ---------- reports ---------- */
 async function vReports(){
@@ -1418,7 +1433,8 @@ async function vHR(){
   return '<div class="card"><div class="between"><h2>'+t('hr_title')+'</h2><button class="btn" onclick="empForm(\'\')">'+t('hr_add')+'</button></div>'
   +'<div id="empFormWrap"></div>'
   +'<div class="mt" style="overflow-x:auto"><table class="tbl"><tr><th>'+t('hr_name')+'</th><th>'+t('f_father')+'</th><th>'+t('hr_cnic')+'</th><th>'+t('hr_phone')+'</th><th>'+t('hr_desig')+'</th><th style="text-align:right">'+t('hr_salary')+'</th><th>'+t('hr_join')+'</th><th></th></tr>'
-  +(rows||'<tr><td colspan="8" class="mut">'+t('hr_nor')+'</td></tr>')+'</table></div></div>';
+  +(rows||'<tr><td colspan="8" class="mut">'+t('hr_nor')+'</td></tr>')+'</table></div></div>'
+  + await payrollCardHTML();
 }
 async function empForm(cnic){
   var e = cnic ? await DB.get('employees',cnic) : {};
@@ -1446,6 +1462,44 @@ async function saveEmp(oldCnic){
 async function delEmp(cnic){ if(!confirm(t('s_confirm_del'))) return; await DB.del('employees',cnic); render(); }
 
 
+
+/* ---------- payroll (salary expenses per month) ---------- */
+async function payrollCardHTML(){
+  var L = LANG==='ur';
+  var pm = window._prMonth || ym(today());
+  var exps = await DB.all('expenses');
+  var emps = await DB.all('employees');
+  var empBy = {}; emps.forEach(function(e){ empBy[e.cnic] = e; });
+  var rows = exps.filter(function(x){ return x.cat==='salary' && x.month===pm; });
+  var tot = 0;
+  var trs = rows.map(function(x){ tot += Number(x.amount)||0; var e = empBy[x.empCnic]||{};
+    return '<tr><td>'+esc(e.name||x.title)+'</td><td>'+esc(e.desig||'-')+'</td><td dir="ltr">'+esc(x.date)+'</td><td style="text-align:right">'+fmt(x.amount)+'</td><td><button class="btn sm gh" onclick="printSalarySlip('+x.id+')">'+(L?'سلپ':'Slip')+'</button></td></tr>'; }).join('');
+  return '<div class="card"><h2>'+(L?'تنخواہیں (پے رول)':'Payroll')+'</h2>'
+  +'<div class="f2"><div class="frow"><label>'+(L?'مہینہ':'Month')+'</label><input type="month" id="pr_month" value="'+pm+'" onchange="window._prMonth=this.value;render()"></div>'
+  +'<div class="frow"><label>&nbsp;</label><p><button class="btn gold" onclick="genPayroll()">'+(L?'تنخواہیں بنائیں':'Generate Payroll')+'</button></p></div></div>'
+  +'<div style="overflow-x:auto"><table class="tbl"><tr><th>'+(L?'ملازم':'Employee')+'</th><th>'+(L?'عہدہ':'Designation')+'</th><th>'+(L?'تاریخ':'Date')+'</th><th style="text-align:right">'+(L?'تنخواہ':'Salary')+'</th><th></th></tr>'
+  +(trs||'<tr><td colspan="5" class="mut">'+(L?'اس مہینے کی تنخواہیں ابھی نہیں بنیں':'No payroll generated for this month yet')+'</td></tr>')
+  +'</table></div>'+(rows.length?'<p class="mt"><b>'+(L?'کل':'Total')+': '+fmt(tot)+'</b></p>':'')+'</div>';
+}
+async function genPayroll(){
+  var L = LANG==='ur';
+  var pm = val('pr_month') || ym(today());
+  window._prMonth = pm;
+  var emps = await DB.all('employees');
+  var exps = await DB.all('expenses');
+  var have = {}; exps.forEach(function(x){ if(x.cat==='salary' && x.month===pm) have[x.empCnic]=1; });
+  var y = Number(pm.slice(0,4)), mo = Number(pm.slice(5,7));
+  var lastDay = new Date(y, mo, 0).getDate();
+  var payDate = (pm === ym(today())) ? today() : pm+'-'+('0'+lastDay).slice(-2);
+  var made = 0;
+  for(var i=0;i<emps.length;i++){ var e = emps[i];
+    if(e.status==='left' || !(Number(e.salary)>0) || have[e.cnic]) continue;
+    await DB.put('expenses',{date:payDate, cat:'salary', title:(L?'تنخواہ':'Salary')+' - '+e.name+' ('+pm+')', amount:Number(e.salary), empCnic:e.cnic, month:pm});
+    made++;
+  }
+  toast(made? (L?'تنخواہیں بن گئیں: ':'Payroll generated: ')+made : (L?'اس مہینے کی تنخواہیں پہلے سے بنی ہیں':'Payroll already generated for this month'));
+  render();
+}
 /* ===== src/pages/attendance.offline.js — attendance pages + mark-all-present (offline variant) ===== */
 /* ---------- attendance ---------- */
 var _attBuf = {}, _attDate = null, _attSes = '';
