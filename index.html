@@ -1099,7 +1099,8 @@ async function vReports(){
   +'<h3 class="mt">Payments</h3><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th>'+t('fee_method')+'</th></tr>'+(payRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('rep_def')+' ('+defs.length+')</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_due')+'</th></tr>'+(defRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('rep_enroll')+'</h2><table class="tbl"><tr><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_count')+'</th></tr>'+(enrRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>'
-  + dxCardHTML();
+  + dxCardHTML()
+  + await growthCardHTML();
 }
 
 /* ---------- data extractor ---------- */
@@ -1201,6 +1202,52 @@ async function dxPrint(){
   var tbl = dxTableHTML(last.ds, last.cols, last.rows).replace('class="tbl"','style="width:100%;border-collapse:collapse"');
   document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+(L?def.label[1]:def.label[0])+' '+(L?'رپورٹ':'Report')+'</div></div><div class="dh"></div>'+tbl+'<p>'+last.rows.length+' '+(L?'ریکارڈ':'records')+' - '+today()+'</p></div>';
   window.print();
+}
+
+/* ---------- growth insights ---------- */
+async function growthCardHTML(){
+  var L = LANG==='ur';
+  var rr = await Promise.all([DB.all('payments'), DB.all('challans'), DB.all('students'), DB.all('expenses'), DB.all('sessions')]);
+  var payments = rr[0], challans = rr[1], students = rr[2], expenses = rr[3], sessions = rr[4];
+  // income: last 6 months
+  var now = new Date(), months = [];
+  for(var bi=5; bi>=0; bi--){ var d = new Date(now.getFullYear(), now.getMonth()-bi, 1); months.push(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)); }
+  var inBy = {}; payments.forEach(function(p){ var k = ym(p.date); inBy[k] = (inBy[k]||0) + (Number(p.amount)||0); });
+  var maxIn = 0; months.forEach(function(m){ if((inBy[m]||0) > maxIn) maxIn = inBy[m]; });
+  var bars = months.map(function(m){ var v = inBy[m]||0; var wpx = maxIn>0 ? Math.round(v/maxIn*100) : 0;
+    return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:64px" dir="ltr">'+m+'</span><div style="flex:1;background:var(--line,#e5e5e5);border-radius:4px"><div style="background:var(--g);height:14px;border-radius:4px;width:'+wpx+'%"></div></div><span style="min-width:80px;text-align:right">'+fmt(v)+'</span></div>'; }).join('');
+  // collection rate
+  var charged = 0, paidT = 0;
+  challans.forEach(function(c){ charged += Number(c.amount)||0; paidT += Number(c.paid)||0; });
+  var rate = charged>0 ? Math.round(paidT/charged*100) : 100;
+  // this month net
+  var cm = ym(today());
+  var inM = inBy[cm]||0, exM = 0;
+  expenses.forEach(function(e){ if(ym(e.date)===cm) exM += Number(e.amount)||0; });
+  // defaulters
+  var dm = await duesMap();
+  var defs = students.filter(function(s){ return (dm[s.cnic]||0) > 0; }).map(function(s){ return { s: s, d: dm[s.cnic] }; });
+  defs.sort(function(a,b){ return b.d-a.d; });
+  var totDue = defs.reduce(function(a,e){ return a+e.d; }, 0);
+  // admissions by session
+  var sesN = {}; sessions.forEach(function(x){ sesN[String(x.id)] = x.name; });
+  var bySes = {}; students.forEach(function(s){ var k = sesN[String(s.session)] || String(s.session||'-'); bySes[k] = (bySes[k]||0)+1; });
+  var sesRows = Object.keys(bySes).sort().reverse().map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="text-align:right">'+bySes[k]+'</td></tr>'; }).join('');
+  // guidance
+  var g = [];
+  if(rate < 80) g.push((L?'وصولی کی شرح صرف ':'Collection rate is only ') + rate + '% — ' + (L?'نادہندگان کو فیس یاد دہانی بھیجیں':'send fee reminders to the defaulters (SMS page)'));
+  if(defs.length) g.push(fmt(totDue) + (L?' روپے بقایا ہیں، ':' outstanding across ') + defs.length + (L?' طلبہ پر۔ سب سے بڑا نادہندہ: ':' students. Biggest defaulter: ') + esc(defs[0].s.name) + ' (' + fmt(defs[0].d) + ')');
+  if(inM - exM < 0) g.push((L?'اس مہینے اخراجات آمدن سے زیادہ ہیں: ':'This month expenses exceed income by ') + fmt(exM - inM));
+  if(!g.length) g.push(L?'مالی حالت صحت مند ہے — وصولی اور اخراجات قابو میں ہیں۔':'Finances look healthy — collection and expenses are under control.');
+  var gHtml = g.map(function(x){ return '<div style="display:flex;gap:8px;padding:5px 0"><span>&#128161;</span><span>'+x+'</span></div>'; }).join('');
+  return '<div class="card"><h2>'+(L?'نمو اور رہنمائی':'Growth & Insights')+'</h2>'
+  +'<div class="grid g4"><div class="stat"><div class="n">'+rate+'%</div><div class="l">'+(L?'وصولی کی شرح':'Collection Rate')+'</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(inM)+'</div><div class="l">'+(L?'اس مہینے کی آمدن':'Income This Month')+'</div></div>'
+  +'<div class="stat"><div class="n">'+fmt(exM)+'</div><div class="l">'+(L?'اس مہینے کے اخراجات':'Expenses This Month')+'</div></div>'
+  +'<div class="stat"><div class="n" style="color:'+((inM-exM)<0?'var(--red)':'inherit')+'">'+fmt(inM-exM)+'</div><div class="l">'+(L?'خالص (اس مہینہ)':'Net This Month')+'</div></div></div>'
+  +'<h3 class="mt">'+(L?'آمدن — پچھلے 6 مہینے':'Income — Last 6 Months')+'</h3>'+bars
+  +'<h3 class="mt">'+(L?'داخلے بلحاظ سیشن':'Admissions by Session')+'</h3><table class="tbl"><tr><th>'+(L?'سیشن':'Session')+'</th><th style="text-align:right">'+(L?'طلبہ':'Students')+'</th></tr>'+sesRows+'</table>'
+  +'<h3 class="mt">'+(L?'رہنمائی':'Guidance')+'</h3>'+gHtml+'</div>';
 }
 /* ===== src/pages/backup.offline.js — backup/restore page + Google Drive backup + date-wise backup (offline variant) ===== */
 /* ---------- backup ---------- */
