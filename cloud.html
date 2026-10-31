@@ -1711,9 +1711,109 @@ async function vReports(){
   +'<h3 class="mt">'+t('rep_bymethod')+'</h3><table class="tbl"><tr><th>'+t('fee_method')+'</th><th style="text-align:right">'+t('rep_total')+'</th></tr>'+(byMRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table>'
   +'<h3 class="mt">Payments</h3><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('fee_date')+'</th><th>'+t('fee_receipt')+'</th><th>'+t('s_name')+'</th><th style="text-align:right">'+t('fee_pamt')+'</th><th>'+t('fee_method')+'</th></tr>'+(payRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
   +'<div class="card"><h2>'+t('rep_def')+' ('+defs.length+')</h2><div style="overflow-x:auto"><table class="tbl"><tr><th>'+t('s_name')+'</th><th>'+t('s_cnic')+'</th><th>'+t('s_phone')+'</th><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_due')+'</th></tr>'+(defRows||'<tr><td colspan="5" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div></div>'
-  +'<div class="card"><h2>'+t('rep_enroll')+'</h2><table class="tbl"><tr><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_count')+'</th></tr>'+(enrRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>';
+  +'<div class="card"><h2>'+t('rep_enroll')+'</h2><table class="tbl"><tr><th>'+t('s_prog')+'</th><th style="text-align:right">'+t('rep_count')+'</th></tr>'+(enrRows||'<tr><td colspan="2" class="mut">'+t('rep_nor')+'</td></tr>')+'</table></div>'
+  + dxCardHTML();
 }
 
+
+/* ---------- data extractor ---------- */
+var DXDEF = {
+  students: { label: ['Students','Students'], cols: [
+    ['name','Name','Name'], ['father','Father','Father'], ['cnic','CNIC','CNIC'], ['phone','Phone','Phone'], ['roll','Roll No','Roll No'],
+    ['program','Programme','Programme'], ['session','Session','Session'], ['adm','Admission','Admission'], ['status','Status','Status'],
+    ['monthly','Monthly Fee','Monthly Fee'], ['paid','Total Paid','Total Paid'], ['due','Total Due','Total Due'] ] },
+  employees: { label: ['Employees','Employees'], cols: [
+    ['name','Name','Name'], ['father','Father','Father'], ['cnic','CNIC','CNIC'], ['phone','Phone','Phone'],
+    ['desig','Designation','Designation'], ['salary','Salary','Salary'], ['joining','Joining','Joining'], ['status','Status','Status'] ] },
+  payments: { label: ['Payments','Payments'], cols: [
+    ['recNo','Receipt No','Receipt No'], ['date','Date','Date'], ['student','Student','Student'], ['cnic','CNIC','CNIC'],
+    ['amount','Amount','Amount'], ['method','Method','Method'] ] },
+  challans: { label: ['Challans','Challans'], cols: [
+    ['no','Challan No','Challan No'], ['sname','Student','Student'], ['cnic','CNIC','CNIC'], ['title','Description','Description'],
+    ['amount','Amount','Amount'], ['paid','Paid','Paid'], ['balance','Balance','Balance'], ['due','Due Date','Due Date'], ['status','Status','Status'], ['month','Month','Month'] ] },
+  expenses: { label: ['Expenses','Expenses'], cols: [
+    ['date','Date','Date'], ['cat','Category','Category'], ['title','Title','Title'], ['amount','Amount','Amount'] ] }
+};
+function dxColsHTML(ds){
+  var def = DXDEF[ds];
+  return def.cols.map(function(c){ return '<label style="display:inline-flex;gap:5px;align-items:center"><input type="checkbox" class="dx_col" value="'+c[0]+'" checked style="width:17px;height:17px"> '+c[1]+'</label>'; }).join('');
+}
+function dxFilterHTML(ds){
+  if(ds==='students') return '<div class="f2"><div class="frow"><label>Programme</label><select id="dx_fprog"><option value="">All</option>'+PROGRAMS.map(function(p){ return '<option value="'+p.k+'">'+esc(progName(p.k))+'</option>'; }).join('')+'</select></div>'
+    +'<div class="frow"><label>Status</label><select id="dx_fstatus"><option value="">All</option><option value="active">Active</option><option value="left">Left</option><option value="done">Completed</option></select></div></div>';
+  if(ds==='employees') return '<div class="frow" style="max-width:220px"><label>Status</label><select id="dx_fstatus"><option value="">All</option><option value="active">Active</option><option value="left">Left</option></select></div>';
+  return '<div class="frow" style="max-width:220px"><label>Month</label><input type="month" id="dx_fmonth"></div>';
+}
+function dxCardHTML(){
+  var opts = Object.keys(DXDEF).map(function(k){ return '<option value="'+k+'">'+DXDEF[k].label[0]+'</option>'; }).join('');
+  return '<div class="card"><h2>Data Extractor</h2>'
+  +'<div class="frow" style="max-width:260px"><label>Dataset</label><select id="dx_ds" onchange="dxCols()">'+opts+'</select></div>'
+  +'<div id="dx_filterWrap" class="mt">'+dxFilterHTML('students')+'</div>'
+  +'<div class="frow mt"><label>Columns</label><div id="dx_cols" class="row" style="flex-wrap:wrap;gap:10px">'+dxColsHTML('students')+'</div></div>'
+  +'<p class="mt"><button class="btn gold" onclick="dxRun()">Show Report</button> <button class="btn gh" onclick="dxPrint()">'+t('cmn_print')+'</button></p>'
+  +'<div id="dx_out" class="mt"></div></div>';
+}
+function dxCols(){
+  var ds = val('dx_ds') || 'students';
+  document.getElementById('dx_cols').innerHTML = dxColsHTML(ds);
+  document.getElementById('dx_filterWrap').innerHTML = dxFilterHTML(ds);
+  document.getElementById('dx_out').innerHTML = '';
+  window._dxLast = null;
+}
+async function dxRows(ds){
+  if(ds==='students'){
+    var all = await DB.all('students');
+    var pf = (document.getElementById('dx_fprog')||{}).value||'';
+    var sf = (document.getElementById('dx_fstatus')||{}).value||'';
+    var dm = await duesMap();
+    var chAll = await DB.all('challans');
+    var paidBy = {}; chAll.forEach(function(c){ paidBy[c.cnic]=(paidBy[c.cnic]||0)+(Number(c.paid)||0); });
+    var sess = await DB.all('sessions'); var sesN = {}; sess.forEach(function(x){ sesN[String(x.id)] = x.name; });
+    return all.filter(function(s){ return (!pf||s.program===pf) && (!sf||s.status===sf); }).map(function(s){
+      return { name:s.name, father:s.father||'', cnic:s.cnic, phone:s.phone||'', roll:s.roll||'', program:progName(s.program), session:sesN[String(s.session)]||s.session||'', adm:s.adm||'', status:s.status, monthly:(s.fee&&Number(s.fee.monthly))||0, paid:paidBy[s.cnic]||0, due:dm[s.cnic]||0 };
+    });
+  }
+  if(ds==='employees'){
+    var em = await DB.all('employees');
+    var sf2 = (document.getElementById('dx_fstatus')||{}).value||'';
+    return em.filter(function(e){ return !sf2||e.status===sf2; }).map(function(e){ return { name:e.name, father:e.father||'', cnic:e.cnic, phone:e.phone||'', desig:e.desig||'', salary:Number(e.salary)||0, joining:e.joining||'', status:e.status||'' }; });
+  }
+  if(ds==='payments'){
+    var ps = await DB.all('payments');
+    var mf = (document.getElementById('dx_fmonth')||{}).value||'';
+    var sts = await DB.all('students'); var nm = {}; sts.forEach(function(x){ nm[x.cnic]=x.name; });
+    return ps.filter(function(p){ return !mf||ym(p.date)===mf; }).map(function(p){ return { recNo:p.recNo, date:p.date, student:nm[p.cnic]||'', cnic:p.cnic, amount:Number(p.amount)||0, method:methodName(p.method) }; });
+  }
+  if(ds==='challans'){
+    var cs = await DB.all('challans');
+    var mf2 = (document.getElementById('dx_fmonth')||{}).value||'';
+    return cs.filter(function(c){ return !mf2||c.month===mf2; }).map(function(c){ return { no:c.no, sname:c.sname||'', cnic:c.cnic, title:c.title, amount:Number(c.amount)||0, paid:Number(c.paid)||0, balance:(Number(c.amount)||0)-(Number(c.paid)||0), due:c.due||'', status:c.status, month:c.month||'' }; });
+  }
+  var ex = await DB.all('expenses');
+  var mf3 = (document.getElementById('dx_fmonth')||{}).value||'';
+  return ex.filter(function(e){ return !mf3||ym(e.date)===mf3; }).map(function(e){ return { date:e.date, cat:expCatName(e.cat), title:e.title, amount:Number(e.amount)||0 }; });
+}
+function dxTableHTML(ds, cols, rows){
+  var def = DXDEF[ds];
+  var head = '<tr>'+cols.map(function(c){ var cd = def.cols.find(function(x){return x[0]===c;}); return '<th>'+(cd?cd[1]:c)+'</th>'; }).join('')+'</tr>';
+  var body = rows.map(function(r){ return '<tr>'+cols.map(function(c){ var v = r[c]; return '<td>'+(v==null||v===''?'':(typeof v==='number'?fmt(v):esc(String(v))))+'</td>'; }).join('')+'</tr>'; }).join('');
+  return '<table class="tbl">'+head+(body||'<tr><td class="mut">No records</td></tr>')+'</table>';
+}
+async function dxRun(){
+  var ds = val('dx_ds') || 'students';
+  var cols = Array.prototype.slice.call(document.querySelectorAll('.dx_col')).filter(function(x){return x.checked;}).map(function(x){return x.value;});
+  if(!cols.length){ toast(t('f_bad')); return; }
+  var rows = await dxRows(ds);
+  document.getElementById('dx_out').innerHTML = '<div style="overflow-x:auto">'+dxTableHTML(ds, cols, rows)+'</div><p class="mut">'+rows.length+' records</p>';
+  window._dxLast = { ds: ds, cols: cols, rows: rows };
+}
+async function dxPrint(){
+  var last = window._dxLast; if(!last){ toast(t('f_bad')); return; }
+  var def = DXDEF[last.ds];
+  var tbl = dxTableHTML(last.ds, last.cols, last.rows).replace('class="tbl"','style="width:100%;border-collapse:collapse"');
+  document.getElementById('printArea').innerHTML = '<div class="doc"><div class="doc-head"><img src="'+LOGO+'" style="width:56px;height:56px;object-fit:contain"><h1>'+esc(await instName())+'</h1><div>'+def.label[0]+' Report</div></div><div class="dh"></div>'+tbl+'<p>'+last.rows.length+' records - '+today()+'</p></div>';
+  window.print();
+}
 /* ===== src/pages/audit.cloud.js — audit log page (cloud variant) ===== */
 async function vAudit(){
   var rows = await DB.req('GET','/rest/v1/audit_log?select=id,created_at,user_id,user_role,action,table_name,record_id,details&order=id.desc&limit=200');
